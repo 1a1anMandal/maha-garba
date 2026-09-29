@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
+@theme {
+  --color-garba-red: #8B0000;
+  --color-garba-darkred: #660000;
+  --color-garba-maroon: #5C0A0A;
+  --color-garba-gold: #FFE600;
+  --color-garba-green: #0c572a;
+  --color-garba-light: #FFF8D6;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #8B0000;
+  --foreground: #FFF8D6;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Background Texture for Paper Crumple Effect */
+.bg-texture {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--background);
+}
+
+.bg-texture::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* SVG noise for texture */
+  background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.15;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Text glow shadow for Gold text */
+.text-glow {
+  text-shadow: 2px 2px 0px #5C0A0A, 4px 4px 0px #3a0606;
+}
+
+/* Dotted traditional borders */
+.border-dots {
+  background-image: radial-gradient(var(--color-garba-light) 30%, transparent 30%);
+  background-size: 20px 20px;
+  background-position: center;
+  background-repeat: repeat-x;
+  height: 20px;
 }
