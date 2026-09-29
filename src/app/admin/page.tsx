@@ -8,11 +8,14 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [entries, setEntries] = useState<any[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"entries" | "requests">("entries");
 
   useEffect(() => {
     checkAuth();
     fetchEntries();
+    fetchRequests();
     
     // Subscribe to realtime changes
     const channel = supabase
@@ -47,6 +50,24 @@ export default function AdminDashboard() {
       
     if (data) setEntries(data);
     setLoading(false);
+  };
+
+  const fetchRequests = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('status', 'pending');
+    if (data) setRequests(data);
+  };
+
+  const handleApprove = async (id: string) => {
+    await supabase.from('profiles').update({ status: 'approved' }).eq('id', id);
+    fetchRequests();
+  };
+
+  const handleReject = async (id: string) => {
+    await supabase.from('profiles').update({ status: 'rejected' }).eq('id', id);
+    fetchRequests();
   };
   
   const filteredData = entries.filter(d => 
@@ -95,67 +116,121 @@ export default function AdminDashboard() {
           <StatCard title="Peak Time" value="Live" icon={<Calendar />} color="purple-400" />
         </div>
 
-        {/* Data Table Section */}
-        <div className="bg-garba-maroon border-2 border-garba-gold/30 rounded-2xl shadow-xl overflow-hidden flex flex-col">
-          
-          <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Recent Entries</h2>
-            
-            <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-garba-light/50" />
-              <input 
-                type="text" 
-                placeholder="Search pass or name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-black/30 border border-garba-gold/30 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:border-garba-gold transition-colors"
-              />
+        {/* Tabs */}
+        <div className="flex gap-4 border-b border-garba-gold/20 pb-2">
+          <button 
+            onClick={() => setActiveTab('entries')}
+            className={`font-bold uppercase tracking-wider px-4 py-2 transition-colors ${activeTab === 'entries' ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 hover:text-garba-light'}`}
+          >
+            Gate Entries
+          </button>
+          <button 
+            onClick={() => setActiveTab('requests')}
+            className={`font-bold uppercase tracking-wider px-4 py-2 transition-colors flex items-center gap-2 ${activeTab === 'requests' ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 hover:text-garba-light'}`}
+          >
+            Access Requests {requests.length > 0 && <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">{requests.length}</span>}
+          </button>
+        </div>
+
+        {/* Dynamic Section */}
+        {activeTab === 'entries' ? (
+          <div className="bg-garba-maroon border-2 border-garba-gold/30 rounded-2xl shadow-xl overflow-hidden flex flex-col animate-fade-in-down">
+            <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Recent Entries</h2>
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-garba-light/50" />
+                <input 
+                  type="text" 
+                  placeholder="Search pass or name..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-black/30 border border-garba-gold/30 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:border-garba-gold transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-black/40 text-garba-gold text-sm uppercase">
+                  <tr>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Pass Serial</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Name(s)</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Type</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Date</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Time</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-garba-gold/10 text-garba-light">
+                  {loading ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-8 text-center opacity-70 animate-pulse">Loading entries...</td>
+                    </tr>
+                  ) : filteredData.map((row) => (
+                    <tr key={row.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 font-mono text-garba-gold">{row.pass_serial}</td>
+                      <td className="px-6 py-4 font-semibold">
+                        {row.name_1} {row.name_2 && <span className="text-garba-light/60 text-sm"><br/>& {row.name_2}</span>}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                          row.entry_type === 'stag' ? 'bg-garba-green/20 text-garba-green' : 'bg-blue-500/20 text-blue-400'
+                        }`}>
+                          {row.entry_type}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 opacity-80">{row.entry_date}</td>
+                      <td className="px-6 py-4 opacity-80">{new Date(row.created_at).toLocaleTimeString('en-IN')}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {!loading && filteredData.length === 0 && (
+                <div className="p-8 text-center text-garba-light/50">
+                  No entries found matching your search.
+                </div>
+              )}
             </div>
           </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-black/40 text-garba-gold text-sm uppercase">
-                <tr>
-                  <th className="px-6 py-4 font-semibold tracking-wider">Pass Serial</th>
-                  <th className="px-6 py-4 font-semibold tracking-wider">Name(s)</th>
-                  <th className="px-6 py-4 font-semibold tracking-wider">Type</th>
-                  <th className="px-6 py-4 font-semibold tracking-wider">Date</th>
-                  <th className="px-6 py-4 font-semibold tracking-wider">Time</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-garba-gold/10 text-garba-light">
-                {loading ? (
+        ) : (
+          <div className="bg-garba-maroon border-2 border-garba-gold/30 rounded-2xl shadow-xl overflow-hidden flex flex-col animate-fade-in-down">
+            <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Pending Operator Requests</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-black/40 text-garba-gold text-sm uppercase">
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center opacity-70 animate-pulse">Loading entries...</td>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Full Name</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Email</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider">Request Date</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider text-right">Actions</th>
                   </tr>
-                ) : filteredData.map((row) => (
-                  <tr key={row.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-6 py-4 font-mono text-garba-gold">{row.pass_serial}</td>
-                    <td className="px-6 py-4 font-semibold">
-                      {row.name_1} {row.name_2 && <span className="text-garba-light/60 text-sm"><br/>& {row.name_2}</span>}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                        row.entry_type === 'stag' ? 'bg-garba-green/20 text-garba-green' : 'bg-blue-500/20 text-blue-400'
-                      }`}>
-                        {row.entry_type}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 opacity-80">{row.entry_date}</td>
-                    <td className="px-6 py-4 opacity-80">{new Date(row.created_at).toLocaleTimeString('en-IN')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            
-            {!loading && filteredData.length === 0 && (
-              <div className="p-8 text-center text-garba-light/50">
-                No entries found matching your search.
-              </div>
-            )}
+                </thead>
+                <tbody className="divide-y divide-garba-gold/10 text-garba-light">
+                  {requests.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-8 text-center opacity-70">No pending access requests.</td>
+                    </tr>
+                  ) : requests.map((req) => (
+                    <tr key={req.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 font-bold">{req.full_name}</td>
+                      <td className="px-6 py-4 opacity-90">{req.email}</td>
+                      <td className="px-6 py-4 opacity-80">{new Date(req.created_at).toLocaleDateString('en-IN')}</td>
+                      <td className="px-6 py-4 text-right space-x-3">
+                        <button onClick={() => handleApprove(req.id)} className="bg-garba-green hover:bg-green-600 text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors">
+                          Approve
+                        </button>
+                        <button onClick={() => handleReject(req.id)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors">
+                          Reject
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </div>
