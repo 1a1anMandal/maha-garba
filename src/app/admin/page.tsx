@@ -90,7 +90,7 @@ export default function AdminDashboard() {
     const matchesDate = filterDate === "all" || d.entry_date === filterDate;
     const matchesType = filterType === "all" || d.entry_type === filterType;
     return matchesSearch && matchesDate && matchesType;
-  });
+  }).sort((a, b) => (a.pass_serial || "").localeCompare(b.pass_serial || "", undefined, { numeric: true }));
 
   const totalEntries = entries.length;
   const stagCount = entries.filter(e => e.entry_type === 'stag').length;
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
       }
       
       // Sort by Pass Number
-      dataToExport = [...dataToExport].sort((a, b) => (a.pass_serial || "").localeCompare(b.pass_serial || ""));
+      dataToExport = [...dataToExport].sort((a, b) => (a.pass_serial || "").localeCompare(b.pass_serial || "", undefined, { numeric: true }));
       
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet('Attendance');
