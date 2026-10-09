@@ -106,9 +106,13 @@ export default function AdminDashboard() {
     const displayData = Array.from(grouped.values()).sort((a, b) => (a.pass_serial ? a.pass_serial.split('_')[0] : "").localeCompare(b.pass_serial ? b.pass_serial.split('_')[0] : "", undefined, { numeric: true }));
 
 
-  const totalEntries = entries.length;
-  const stagCount = entries.filter(e => e.entry_type === 'stag').length;
-  const duoCount = entries.filter(e => e.entry_type === 'duo').length;
+  const allUniquePasses = new Map<string, any>();
+  entries.forEach(e => allUniquePasses.set(`${e.pass_serial.split('_')[0]}_${e.entry_type}`, e));
+  const uniquePassesArr = Array.from(allUniquePasses.values());
+
+  const totalEntries = uniquePassesArr.length;
+  const stagCount = uniquePassesArr.filter(e => e.entry_type === 'stag').length;
+  const duoCount = uniquePassesArr.filter(e => e.entry_type === 'duo').length;
   
   const uniqueDates = Array.from(new Set(entries.map(e => e.entry_date))).sort((a, b) => (b as string).localeCompare(a as string));
 
@@ -260,7 +264,7 @@ export default function AdminDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
           <StatCard 
-            title="Total Entries" 
+            title="Total Passes" 
             value={totalEntries.toString()} 
             icon={<Users />} 
             color="garba-gold" 
@@ -315,13 +319,13 @@ export default function AdminDashboard() {
                 <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Entries</h2>
                 <div className="flex gap-3 text-xs font-bold uppercase tracking-wider">
                   <span className="text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">
-                    Total: {entries.filter(d => filterDate === 'all' || d.entry_date === filterDate).length}
+                    Total: {displayData.length}
                   </span>
                   <span className="text-garba-green bg-garba-green/10 px-2 py-0.5 rounded">
-                    Stag: {entries.filter(d => (filterDate === 'all' || d.entry_date === filterDate) && d.entry_type === 'stag').length}
+                    Stag: {displayData.filter(d => d.entry_type === 'stag').length}
                   </span>
                   <span className="text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded">
-                    Duo: {entries.filter(d => (filterDate === 'all' || d.entry_date === filterDate) && d.entry_type === 'duo').length}
+                    Duo: {displayData.filter(d => d.entry_type === 'duo').length}
                   </span>
                 </div>
               </div>
