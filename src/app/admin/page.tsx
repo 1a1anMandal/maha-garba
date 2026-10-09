@@ -81,7 +81,10 @@ export default function AdminDashboard() {
   const duoCount = entries.filter(e => e.entry_type === 'duo').length;
 
   return (
-    <div className="relative z-10 min-h-screen bg-black/40 backdrop-blur-sm p-4 sm:p-8">
+    <>
+      <div className="bg-app bg-admin"></div>
+      <div className="bg-overlay"></div>
+      <div className="relative z-10 min-h-screen p-4 sm:p-8">
       
       <div className="max-w-6xl mx-auto space-y-8">
         
@@ -234,6 +237,7 @@ export default function AdminDashboard() {
 
       </div>
     </div>
+    </>
   );
 }
 

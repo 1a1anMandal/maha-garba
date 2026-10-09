@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${rozhaOne.variable} ${openSans.variable} font-sans antialiased bg-texture min-h-screen flex flex-col`}
+        className={`${rozhaOne.variable} ${openSans.variable} font-sans antialiased min-h-screen flex flex-col`}
       >
         {children}
       </body>

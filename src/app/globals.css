@@ -22,16 +22,35 @@ body {
   padding: 0;
 }
 
-/* Rich Background with Spotlight and Mandala Pattern */
-.bg-texture {
+/* Global Background Base */
+.bg-app {
   position: fixed;
   inset: 0;
-  background: 
-    radial-gradient(circle at 50% 110%, rgba(245, 183, 0, 0.25) 0%, rgba(140, 9, 9, 0.8) 40%, #1a0000 90%),
-    url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 0 L65 55 L120 60 L65 65 L60 120 L55 65 L0 60 L55 55 Z' fill='%23f5b700' fill-opacity='0.04'/%3E%3Ccircle cx='60' cy='60' r='50' fill='none' stroke='%23f5b700' stroke-width='1' stroke-opacity='0.04' stroke-dasharray='4 4'/%3E%3C/svg%3E");
-  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   z-index: -1;
   pointer-events: none;
+}
+
+.bg-login {
+  background-image: url('/bg-login.jpg');
+}
+
+.bg-entry {
+  background-image: url('/bg-entry.jpg');
+}
+
+.bg-admin {
+  background-image: url('/bg-admin.png');
+}
+
+.bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: -1;
 }
 
 /* Base Card Style - Dark translucent with Gold Border */

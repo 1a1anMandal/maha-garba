@@ -103,7 +103,10 @@ export default function Login() {
   };
 
   return (
-    <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
+    <>
+      <div className="bg-app bg-login"></div>
+      <div className="bg-overlay"></div>
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
       <div className="text-center mb-8 animate-fade-in-down flex flex-col items-center">
         <DandiyaIcon className="w-16 h-16 mb-2" />
         <h1 className="text-4xl sm:text-6xl font-black text-garba-gold text-glow uppercase tracking-wider font-[family-name:var(--font-rozha)]">
@@ -209,6 +212,6 @@ export default function Login() {
         </div>
         <div className="border-dots opacity-50 mb-4 mx-4"></div>
       </div>
-    </div>
+    </>
   );
 }

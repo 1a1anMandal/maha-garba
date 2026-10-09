@@ -84,7 +84,10 @@ export default function GateEntry() {
   };
 
   return (
-    <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
+    <>
+      <div className="bg-app bg-entry"></div>
+      <div className="bg-overlay"></div>
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
       
       {/* Decorative Header */}
       <div className="text-center mb-8 animate-fade-in flex flex-col items-center relative w-full max-w-md">
@@ -284,5 +287,6 @@ export default function GateEntry() {
         .animate-shake { animation: shake 0.4s ease-in-out; }
       `}} />
     </div>
+    </>
   );
 }
