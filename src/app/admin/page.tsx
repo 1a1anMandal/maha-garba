@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
-import { Users, User, Ticket, Calendar, Download, Search, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import { Users, User, Ticket, Calendar, Download, Search, LayoutDashboard, LogOut, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
@@ -21,6 +21,9 @@ export default function AdminDashboard() {
   // Export State
   const [isExporting, setIsExporting] = useState(false);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  
+  // Expand State
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -326,29 +329,55 @@ export default function AdminDashboard() {
                     <th className="px-6 py-4 font-semibold tracking-wider">Type</th>
                     <th className="px-6 py-4 font-semibold tracking-wider">Date</th>
                     <th className="px-6 py-4 font-semibold tracking-wider">Time</th>
+                    <th className="px-6 py-4 font-semibold tracking-wider"></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-garba-gold/10 text-garba-light">
                   {loading ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center opacity-70 animate-pulse">Loading entries...</td>
+                      <td colSpan={6} className="px-6 py-8 text-center opacity-70 animate-pulse">Loading entries...</td>
                     </tr>
                   ) : filteredData.map((row) => (
-                    <tr key={row.id} className="hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 font-mono text-garba-gold">{row.pass_serial}</td>
-                      <td className="px-6 py-4 font-semibold">
-                        {row.name_1} {row.name_2 && <span className="text-garba-light/60 text-sm"><br/>& {row.name_2}</span>}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                          row.entry_type === 'stag' ? 'bg-garba-green/20 text-garba-green' : 'bg-blue-500/20 text-blue-400'
-                        }`}>
-                          {row.entry_type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 opacity-80">{row.entry_date}</td>
-                      <td className="px-6 py-4 opacity-80">{new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
-                    </tr>
+                    <Fragment key={row.id}>
+                      <tr 
+                        className={`hover:bg-white/5 transition-colors cursor-pointer ${expandedRowId === row.id ? 'bg-white/5' : ''}`}
+                        onClick={() => setExpandedRowId(expandedRowId === row.id ? null : row.id)}
+                      >
+                        <td className="px-6 py-4 font-mono text-garba-gold">{row.pass_serial}</td>
+                        <td className="px-6 py-4 font-semibold">
+                          {row.name_1} {row.name_2 && <span className="text-garba-light/80"><br/>& {row.name_2}</span>}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                            row.entry_type === 'stag' ? 'bg-garba-green/20 text-garba-green' : 'bg-blue-500/20 text-blue-400'
+                          }`}>
+                            {row.entry_type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 opacity-80">{row.entry_date}</td>
+                        <td className="px-6 py-4 opacity-80">{new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
+                        <td className="px-6 py-4 text-right">
+                          {expandedRowId === row.id ? <ChevronUp className="w-5 h-5 text-garba-gold inline-block" /> : <ChevronDown className="w-5 h-5 text-garba-light/50 inline-block" />}
+                        </td>
+                      </tr>
+                      {expandedRowId === row.id && (
+                        <tr className="bg-black/40">
+                          <td colSpan={6} className="px-6 py-4 border-t-0">
+                            <div className="flex flex-col gap-3 p-2">
+                              <h4 className="text-garba-gold text-sm font-bold uppercase tracking-wider">Attendance History for Pass {row.pass_serial}</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {entries.filter(e => e.pass_serial === row.pass_serial).sort((a,b) => a.entry_date.localeCompare(b.entry_date)).map(historyEntry => (
+                                  <span key={historyEntry.id} className="bg-white/10 text-garba-light px-3 py-1.5 rounded-lg border border-white/20 text-sm flex items-center gap-2">
+                                    <Calendar className="w-3 h-3 text-garba-gold" />
+                                    {historyEntry.entry_date}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
