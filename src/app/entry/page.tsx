@@ -18,6 +18,8 @@ export default function GateEntry() {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [showTypePopup, setShowTypePopup] = useState(false);
+  const [pendingMatches, setPendingMatches] = useState<any[]>([]);
 
   const passInputRef = useRef<HTMLInputElement>(null);
 
@@ -34,16 +36,31 @@ export default function GateEntry() {
 
   // Autofill logic
   useEffect(() => {
-    if (passSerial.length >= 3) {
-      // Allow matching '005' or 'MG-2024-005'
-      const match = preRegistered.find(p => p.pass_serial === passSerial || passSerial.endsWith(p.pass_serial));
-      if (match) {
-        setName1(match.name_1);
-        if (match.name_2) setName2(match.name_2);
-        setEntryType(match.entry_type as "stag" | "duo");
+    const timer = setTimeout(() => {
+      if (passSerial.length >= 3 && !name1 && !showTypePopup) {
+        const matches = preRegistered.filter(p => p.pass_serial === passSerial || passSerial.endsWith(p.pass_serial));
+        if (matches.length > 0) {
+          setPendingMatches(matches);
+          setShowTypePopup(true);
+        }
       }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [passSerial, name1, showTypePopup]);
+
+  const handleSelectType = (selectedType: "stag" | "duo") => {
+    const match = pendingMatches.find(m => m.entry_type === selectedType);
+    if (match) {
+      setName1(match.name_1);
+      if (match.name_2) setName2(match.name_2);
+      else setName2("");
+    } else {
+      setName1("");
+      setName2("");
     }
-  }, [passSerial]);
+    setEntryType(selectedType);
+    setShowTypePopup(false);
+  };
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -132,51 +149,98 @@ export default function GateEntry() {
         <div className="p-6 sm:p-8 pt-4">
           
           {/* Status Banners */}
-          {status === "success" && (
-            <div className="mb-6 bg-garba-green text-white p-4 rounded-xl flex items-center gap-3 animate-bounce-in">
-              <CheckCircle2 className="w-8 h-8" />
-              <div>
-                <p className="font-bold text-lg">Entry Successful!</p>
-                <p className="text-sm opacity-90">Ready for next pass.</p>
-              </div>
+          {/* Popup Notifications */}
+      {status === "success" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
+          <div className="bg-garba-green text-white p-8 rounded-2xl flex flex-col items-center gap-4 animate-bounce-in shadow-2xl max-w-sm w-full mx-4 border-2 border-green-400">
+            <CheckCircle2 className="w-16 h-16" />
+            <div className="text-center">
+              <p className="font-black text-2xl uppercase tracking-wider">Entry Successful!</p>
+              <p className="text-lg opacity-90 mt-2">Ready for next pass.</p>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          {status === "duplicate" && (
-            <div className="mb-6 bg-red-600 text-white p-4 rounded-xl flex items-start gap-3 animate-shake">
-              <AlertCircle className="w-8 h-8 shrink-0 mt-1" />
-              <div>
-                <p className="font-bold text-lg">Warning: Pass Already Used!</p>
-                <p className="text-sm opacity-90 mt-1">This pass was already scanned today.</p>
-                <button 
-                  onClick={() => {
-                    setStatus("idle");
-                    setPassSerial("");
-                    passInputRef.current?.focus();
-                  }}
-                  className="mt-3 bg-white text-red-600 px-4 py-1 rounded font-bold text-sm hover:bg-gray-100 transition"
-                >
-                  Clear & Scan Next
-                </button>
-              </div>
+      {status === "duplicate" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
+          <div className="bg-red-600 text-white p-8 rounded-2xl flex flex-col items-center gap-4 animate-shake shadow-2xl max-w-sm w-full mx-4 border-2 border-red-400">
+            <AlertCircle className="w-16 h-16 shrink-0" />
+            <div className="text-center">
+              <p className="font-black text-2xl uppercase tracking-wider">Pass Already Used!</p>
+              <p className="text-lg opacity-90 mt-2">This pass was already scanned today.</p>
+              <button 
+                onClick={() => {
+                  setStatus("idle");
+                  setPassSerial("");
+                  setName1("");
+                  setName2("");
+                  passInputRef.current?.focus();
+                }}
+                className="mt-6 w-full bg-white text-red-600 px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-lg active:scale-95"
+              >
+                Clear & Scan Next
+              </button>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          {status === "error" && (
-            <div className="mb-6 bg-red-600 text-white p-4 rounded-xl flex items-start gap-3 animate-shake">
-              <AlertCircle className="w-8 h-8 shrink-0 mt-1" />
-              <div>
-                <p className="font-bold text-lg">System Error!</p>
-                <p className="text-sm opacity-90 mt-1">{errorMsg}</p>
-                <button 
-                  onClick={() => setStatus("idle")}
-                  className="mt-3 bg-white text-red-600 px-4 py-1 rounded font-bold text-sm hover:bg-gray-100 transition"
-                >
-                  Dismiss
-                </button>
-              </div>
+      {status === "error" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
+          <div className="bg-red-600 text-white p-8 rounded-2xl flex flex-col items-center gap-4 animate-shake shadow-2xl max-w-sm w-full mx-4 border-2 border-red-400">
+            <AlertCircle className="w-16 h-16 shrink-0" />
+            <div className="text-center">
+              <p className="font-black text-2xl uppercase tracking-wider">System Error!</p>
+              <p className="text-lg opacity-90 mt-2">{errorMsg}</p>
+              <button 
+                onClick={() => setStatus("idle")}
+                className="mt-6 w-full bg-white text-red-600 px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-lg active:scale-95"
+              >
+                Dismiss
+              </button>
             </div>
-          )}
+          </div>
+        </div>
+      )}
+
+      {/* Select Pass Type Popup */}
+      {showTypePopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
+          <div className="bg-garba-darkred text-white p-8 rounded-2xl flex flex-col items-center gap-6 shadow-2xl max-w-md w-full mx-4 border-2 border-garba-gold">
+            <div className="text-center">
+              <h3 className="font-black text-2xl text-garba-gold uppercase tracking-wider mb-2">Select Pass Type</h3>
+              <p className="text-garba-light/80">Please confirm if this is a Stag or Duo pass before proceeding.</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <button
+                type="button"
+                onClick={() => handleSelectType("stag")}
+                className="py-4 rounded-xl flex flex-col items-center justify-center gap-3 font-bold border-2 bg-black/40 text-white/90 border-garba-gold/30 hover:border-garba-gold hover:bg-garba-gold/20 transition-all active:scale-95"
+              >
+                <User className="w-8 h-8 text-garba-gold" /> 
+                <span className="text-lg">STAG (1)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectType("duo")}
+                className="py-4 rounded-xl flex flex-col items-center justify-center gap-3 font-bold border-2 bg-black/40 text-white/90 border-garba-gold/30 hover:border-garba-gold hover:bg-garba-gold/20 transition-all active:scale-95"
+              >
+                <Users className="w-8 h-8 text-garba-gold" /> 
+                <span className="text-lg">DUO (2)</span>
+              </button>
+            </div>
+            
+            <button 
+              onClick={() => setShowTypePopup(false)}
+              className="mt-2 text-sm text-garba-light/60 hover:text-white transition-colors underline underline-offset-4"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* Pass Serial */}

@@ -1,752 +1,968 @@
 [
-    {
-        "pass_serial":  "005",
-        "name_2":  "NAINA PANCHAL",
-        "entry_type":  "duo",
-        "name_1":  "KASHISH SINGHARIA"
-    },
-    {
-        "pass_serial":  "006",
-        "name_2":  "RAJ SINGH BHAGEDI",
-        "entry_type":  "duo",
-        "name_1":  "ROSHNI BHADORIYA"
-    },
-    {
-        "pass_serial":  "019",
-        "name_2":  "MAHIMASEN",
-        "entry_type":  "duo",
-        "name_1":  "ROUNAK MAKRAYA"
-    },
-    {
-        "pass_serial":  "025",
-        "name_2":  "SAHARSH TIWARI",
-        "entry_type":  "duo",
-        "name_1":  "PRIYANSHU PRASHANT"
-    },
-    {
-        "pass_serial":  "026",
-        "name_2":  "ANJALI HASIJA",
-        "entry_type":  "duo",
-        "name_1":  "SWAPNIL MEENA"
-    },
-    {
-        "pass_serial":  "033",
-        "name_2":  "SIMRAN KUSHWAHA",
-        "entry_type":  "duo",
-        "name_1":  "ROHIT PATEL"
-    },
-    {
-        "pass_serial":  "039",
-        "name_2":  "TANISHA BAND",
-        "entry_type":  "duo",
-        "name_1":  "DEVRAJ SINGH CHOUHAN"
-    },
-    {
-        "pass_serial":  "040",
-        "name_2":  "VAIDHI PARMAR",
-        "entry_type":  "duo",
-        "name_1":  "PRIYANSHI CHAWLA"
-    },
-    {
-        "pass_serial":  "062",
-        "name_2":  "ROSHINI MEENA",
-        "entry_type":  "duo",
-        "name_1":  "RANI CHOURASHIYA"
-    },
-    {
-        "pass_serial":  "068",
-        "name_2":  "ANSH YADAV",
-        "entry_type":  "duo",
-        "name_1":  "DEV LODHI"
-    },
-    {
-        "pass_serial":  "073",
-        "name_2":  "VINOD SHAH",
-        "entry_type":  "duo",
-        "name_1":  "GAUTAM SHAH"
-    },
-    {
-        "pass_serial":  "081",
-        "name_2":  "VINAYAK SHARMA",
-        "entry_type":  "duo",
-        "name_1":  "RIJAK GUMBER"
-    },
-    {
-        "pass_serial":  "082",
-        "name_2":  "SHIVANGI DHAKAR",
-        "entry_type":  "duo",
-        "name_1":  "SWAYAM RAJPUT"
-    },
-    {
-        "pass_serial":  "089",
-        "name_2":  "SANJANA PATEL",
-        "entry_type":  "duo",
-        "name_1":  "RIYA PATEL"
-    },
-    {
-        "pass_serial":  "099",
-        "name_2":  "ANJALI SONI",
-        "entry_type":  "duo",
-        "name_1":  "RUDRA PRATAP SINGH"
-    },
-    {
-        "pass_serial":  "108",
-        "name_2":  "PRINCE PATEL",
-        "entry_type":  "duo",
-        "name_1":  "PAYAL SINGH"
-    },
-    {
-        "pass_serial":  "110",
-        "name_2":  "PUJA MANDAL",
-        "entry_type":  "duo",
-        "name_1":  "PRAGATI KUSHWAHA"
-    },
-    {
-        "pass_serial":  "132",
-        "name_2":  "AASHI RAGHUVANSHI",
-        "entry_type":  "duo",
-        "name_1":  "MANISHA MEENA"
-    },
-    {
-        "pass_serial":  "137",
-        "name_2":  "AKANSHA KHARE",
-        "entry_type":  "duo",
-        "name_1":  "AVIKA ARTHEY"
-    },
-    {
-        "pass_serial":  "152",
-        "name_2":  "RAGHAV SRIVASTAVA",
-        "entry_type":  "duo",
-        "name_1":  "KHUSHI THAKUR"
-    },
-    {
-        "pass_serial":  "156",
-        "name_2":  "ISHAN PATEL",
-        "entry_type":  "duo",
-        "name_1":  "AASTHA BAGHEL"
-    },
-    {
-        "pass_serial":  "157",
-        "name_2":  "ISHIKA SAHANE",
-        "entry_type":  "duo",
-        "name_1":  "VINEET TIWARI"
-    },
-    {
-        "pass_serial":  "158",
-        "name_2":  "HARSHITA JADHAV",
-        "entry_type":  "duo",
-        "name_1":  "AMAR DANDE"
-    },
-    {
-        "pass_serial":  "160",
-        "name_2":  "DIVYANI JADHAV",
-        "entry_type":  "duo",
-        "name_1":  "SARVAGYA KUSHWAHA"
-    },
-    {
-        "pass_serial":  "166",
-        "name_2":  "AMAN GAUTAM",
-        "entry_type":  "duo",
-        "name_1":  "SHIVANGI GUPTA"
-    },
-    {
-        "pass_serial":  "172",
-        "name_2":  "MANTHAN",
-        "entry_type":  "duo",
-        "name_1":  "ISHIKA TIWARI"
-    },
-    {
-        "pass_serial":  "178",
-        "name_2":  "HARSH VARDHAN PATEL",
-        "entry_type":  "duo",
-        "name_1":  "KANAK ANDANI"
-    },
-    {
-        "pass_serial":  "179",
-        "name_2":  "RITIK CHAUHAN",
-        "entry_type":  "duo",
-        "name_1":  "ADITI BATHA"
-    },
-    {
-        "pass_serial":  "181",
-        "name_2":  "SAKSHI DANGI",
-        "entry_type":  "duo",
-        "name_1":  "ARYAN KUMAR SINGH"
-    },
-    {
-        "pass_serial":  "182",
-        "name_2":  "ADITYA AMAN",
-        "entry_type":  "duo",
-        "name_1":  "RAM DETHLIYA"
-    },
-    {
-        "pass_serial":  "183",
-        "name_2":  "KRISHIKA KUMARI",
-        "entry_type":  "duo",
-        "name_1":  "ASHI RATHORE"
-    },
-    {
-        "pass_serial":  "184",
-        "name_2":  "HIMANI YEDE",
-        "entry_type":  "duo",
-        "name_1":  "SHIVI TIWARI"
-    },
-    {
-        "pass_serial":  "195",
-        "name_2":  "NIKITA KUNDELKAR",
-        "entry_type":  "duo",
-        "name_1":  "SHAGUN VERMA"
-    },
-    {
-        "pass_serial":  "196",
-        "name_2":  "STUTI SAXENA",
-        "entry_type":  "duo",
-        "name_1":  "NIRANJANA SINGH"
-    },
-    {
-        "pass_serial":  "222",
-        "name_2":  "ABIRA SAXENA",
-        "entry_type":  "duo",
-        "name_1":  "CHARVI CHOURASIYA"
-    },
-    {
-        "pass_serial":  "225",
-        "name_2":  "NIKHIL RAGHUWANSHI",
-        "entry_type":  "duo",
-        "name_1":  "BHAVESH KARADE"
-    },
-    {
-        "pass_serial":  "229",
-        "name_2":  "ARYAN KUMAR SINGH",
-        "entry_type":  "duo",
-        "name_1":  "AARAV DUBEY"
-    },
-    {
-        "pass_serial":  "272",
-        "name_2":  "ISHAN TAYADE",
-        "entry_type":  "duo",
-        "name_1":  "PRASIKH  SAHU"
-    },
-    {
-        "pass_serial":  "275",
-        "name_2":  "PRANJAL MAHAR",
-        "entry_type":  "duo",
-        "name_1":  "SAMARENDRA SINGH"
-    },
-    {
-        "pass_serial":  "276",
-        "name_2":  "YOGESH YADAV",
-        "entry_type":  "duo",
-        "name_1":  "YATISH  VISHWAKARMA"
-    },
-    {
-        "pass_serial":  "277",
-        "name_2":  "ABHISHEK RAJAWAT",
-        "entry_type":  "duo",
-        "name_1":  "KANISHKA SHARMA"
-    },
-    {
-        "pass_serial":  "281",
-        "name_2":  "MEHER MALVIYA",
-        "entry_type":  "duo",
-        "name_1":  "ARSIF KHAN"
-    },
-    {
-        "pass_serial":  "282",
-        "name_2":  "ANUPAM KUMAR",
-        "entry_type":  "duo",
-        "name_1":  "KRISHNA PRATAP SINGH"
-    },
-    {
-        "pass_serial":  "283",
-        "name_2":  "ADDYA DIWEDI",
-        "entry_type":  "duo",
-        "name_1":  "ANUKALP SHARMA"
-    },
-    {
-        "pass_serial":  "284",
-        "name_2":  "OSHIN XALXO",
-        "entry_type":  "duo",
-        "name_1":  "KANIKA GAWANDE"
-    },
-    {
-        "pass_serial":  "285",
-        "name_2":  "POONAM PANCHESHWAR",
-        "entry_type":  "duo",
-        "name_1":  "KANAK VAERMAN"
-    },
-    {
-        "pass_serial":  "291",
-        "name_2":  "ABHINAY SIGH RATHODE",
-        "entry_type":  "duo",
-        "name_1":  "ANANYA RATHODE"
-    },
-    {
-        "pass_serial":  "296",
-        "name_2":  "AMAN JAISWAL",
-        "entry_type":  "duo",
-        "name_1":  "ANKUSH SHAH"
-    },
-    {
-        "pass_serial":  "300",
-        "name_2":  "RADHA PATHAK",
-        "entry_type":  "duo",
-        "name_1":  "VANSHIKA PARMAR"
-    },
-    {
-        "pass_serial":  "307",
-        "name_2":  "SHREYA PATEL",
-        "entry_type":  "duo",
-        "name_1":  "SHIVANI KUMARI"
-    },
-    {
-        "pass_serial":  "310",
-        "name_2":  "ANKIT SHARMA",
-        "entry_type":  "duo",
-        "name_1":  "PIYUSH YADAV"
-    },
-    {
-        "pass_serial":  "314",
-        "name_2":  "SWATI KORRAM",
-        "entry_type":  "duo",
-        "name_1":  "VIVEK SINGH"
-    },
-    {
-        "pass_serial":  "315",
-        "name_2":  "RATNA SINGH",
-        "entry_type":  "duo",
-        "name_1":  "SUMAN GUPTA"
-    },
-    {
-        "pass_serial":  "316",
-        "name_2":  "PRATYAKSH MAITHIL",
-        "entry_type":  "duo",
-        "name_1":  "AJAY SINGH RAJPUT"
-    },
-    {
-        "pass_serial":  "317",
-        "name_2":  "PRIYANSHI SINHG",
-        "entry_type":  "duo",
-        "name_1":  "KUSHI PAWAR"
-    },
-    {
-        "pass_serial":  "323",
-        "name_2":  "SACHINN MEENA",
-        "entry_type":  "duo",
-        "name_1":  "GOURAV DEHARYA"
-    },
-    {
-        "pass_serial":  "325",
-        "name_2":  "MAYANK PATEL",
-        "entry_type":  "duo",
-        "name_1":  "NANDANI DUBEY"
-    },
-    {
-        "pass_serial":  "334",
-        "name_2":  "VAISHNAVI SEN",
-        "entry_type":  "duo",
-        "name_1":  "HUZEFA MOHOMMMAD"
-    },
-    {
-        "pass_serial":  "335",
-        "name_2":  "PRANJALI MANDLOY",
-        "entry_type":  "duo",
-        "name_1":  "ADITI DIXIT"
-    },
-    {
-        "pass_serial":  "336",
-        "name_2":  "SOMESH MEHRA",
-        "entry_type":  "duo",
-        "name_1":  "KANISHCA KOSTA"
-    },
-    {
-        "pass_serial":  "337",
-        "name_2":  "SANKET SRIVASTAVA",
-        "entry_type":  "duo",
-        "name_1":  "SONAKSHI SALVE"
-    },
-    {
-        "pass_serial":  "340",
-        "name_2":  "MAHI JHA",
-        "entry_type":  "duo",
-        "name_1":  "ANKITA PANDIT"
-    },
-    {
-        "pass_serial":  "345",
-        "name_2":  "GARIMA JAISWAL",
-        "entry_type":  "duo",
-        "name_1":  "ROHAN VERMA"
-    },
-    {
-        "pass_serial":  "349",
-        "name_2":  "RADHIKA YADUWANSHI",
-        "entry_type":  "duo",
-        "name_1":  "VIBHA BARMAN"
-    },
-    {
-        "pass_serial":  "362",
-        "name_2":  "PRIYANSHU BANURIYA",
-        "entry_type":  "duo",
-        "name_1":  "CHHAYANK JOSHI"
-    },
-    {
-        "pass_serial":  "363",
-        "name_2":  "JATIN SHRIVASYAV",
-        "entry_type":  "duo",
-        "name_1":  "MARIYAM KHAN"
-    },
-    {
-        "pass_serial":  "364",
-        "name_2":  "PALAK SAHU",
-        "entry_type":  "duo",
-        "name_1":  "ISHIKA MISHRA"
-    },
-    {
-        "pass_serial":  "365",
-        "name_2":  "APARNA VISWAKARA",
-        "entry_type":  "duo",
-        "name_1":  "TANMAY SONI"
-    },
-    {
-        "pass_serial":  "368",
-        "name_2":  "AADHYA RAI",
-        "entry_type":  "duo",
-        "name_1":  "OJASWANI KHATRI"
-    },
-    {
-        "pass_serial":  "369",
-        "name_2":  "SURGESH AHIRWAR",
-        "entry_type":  "duo",
-        "name_1":  "SHIVAM KUMAR PATEL"
-    },
-    {
-        "pass_serial":  "370",
-        "name_2":  "KASHVI LODHI",
-        "entry_type":  "duo",
-        "name_1":  "KHUSHI PANDEY"
-    },
-    {
-        "pass_serial":  "371",
-        "name_2":  "FARDEEN QUORESHI",
-        "entry_type":  "duo",
-        "name_1":  "PRISHA AGNIOTRI"
-    },
-    {
-        "pass_serial":  "375",
-        "name_2":  "ABHISHAKE SINGH",
-        "entry_type":  "duo",
-        "name_1":  "HARSHVARDHANT GAIKWARD"
-    },
-    {
-        "pass_serial":  "376",
-        "name_2":  "PAVITRA BIDUA",
-        "entry_type":  "duo",
-        "name_1":  "JAIYESH BIYANI"
-    },
-    {
-        "pass_serial":  "391",
-        "name_2":  "PRIYANSHU RATHORE",
-        "entry_type":  "duo",
-        "name_1":  "SANJANA YADAV"
-    },
-    {
-        "pass_serial":  "401",
-        "name_2":  "DIYA PARDARSHINI",
-        "entry_type":  "duo",
-        "name_1":  "NANDINI MORE"
-    },
-    {
-        "pass_serial":  "405",
-        "name_2":  "KRISHNA DWAIDI",
-        "entry_type":  "duo",
-        "name_1":  "NOMAN KHAN"
-    },
-    {
-        "pass_serial":  "406",
-        "name_2":  "----",
-        "entry_type":  "duo",
-        "name_1":  "ARMAN RAJA"
-    },
-    {
-        "pass_serial":  "413",
-        "name_2":  "VIDYA PATLE",
-        "entry_type":  "duo",
-        "name_1":  "PARNJALI FALKE"
-    },
-    {
-        "pass_serial":  "414",
-        "name_2":  "RITU AMRUTE",
-        "entry_type":  "duo",
-        "name_1":  "SHRUTI PATANKAR"
-    },
-    {
-        "pass_serial":  "423",
-        "name_2":  "ABHISHAEK MEENA",
-        "entry_type":  "duo",
-        "name_1":  "RITIKA TIWARI"
-    },
-    {
-        "pass_serial":  "424",
-        "name_2":  "NIRJALA NETAM",
-        "entry_type":  "duo",
-        "name_1":  "EKTA BANJARA"
-    },
-    {
-        "pass_serial":  "426",
-        "name_2":  "SWAYAM RAGHUWANSHI",
-        "entry_type":  "duo",
-        "name_1":  "KRISH SONARE"
-    },
-    {
-        "pass_serial":  "427",
-        "name_2":  "ADITYA LOWANSHI",
-        "entry_type":  "duo",
-        "name_1":  "DIVYANSHI VERMA"
-    },
-    {
-        "pass_serial":  "429",
-        "name_2":  "----",
-        "entry_type":  "duo",
-        "name_1":  "ANSHIKA JHA"
-    },
-    {
-        "pass_serial":  "433",
-        "name_2":  "HARSHITA JAISWAL",
-        "entry_type":  "duo",
-        "name_1":  "ARSHITA DARYANI"
-    },
-    {
-        "pass_serial":  "440",
-        "name_2":  "YASH WARULA",
-        "entry_type":  "duo",
-        "name_1":  "EKTA LOWANSHI"
-    },
-    {
-        "pass_serial":  "441",
-        "name_2":  "PURTI MISHRA",
-        "entry_type":  "duo",
-        "name_1":  "TANISHQA BAIRAGI"
-    },
-    {
-        "pass_serial":  "442",
-        "name_2":  "RUPAL DHURVAY",
-        "entry_type":  "duo",
-        "name_1":  "UDITA LOWANSHI"
-    },
-    {
-        "pass_serial":  "443",
-        "name_2":  "RIYA SIKANIYA",
-        "entry_type":  "duo",
-        "name_1":  "VANSHIKA BAIGA"
-    },
-    {
-        "pass_serial":  "501",
-        "name_2":  "ANUSHRI SEN",
-        "entry_type":  "duo",
-        "name_1":  "MADHUR TAMRAKAR"
-    },
-    {
-        "pass_serial":  "503",
-        "name_2":  "-----",
-        "entry_type":  "duo",
-        "name_1":  "KUNAL RATHORE"
-    },
-    {
-        "pass_serial":  "504",
-        "name_2":  "RADHIKA MEHER",
-        "entry_type":  "duo",
-        "name_1":  "VISHAL VISHWAKARMA"
-    },
-    {
-        "pass_serial":  "903",
-        "name_2":  "KAVYANSH SRIVASTAVA",
-        "entry_type":  "duo",
-        "name_1":  "SANSKAR NIRWAHA"
-    },
-    {
-        "pass_serial":  "910",
-        "name_2":  "RITESH PATEL",
-        "entry_type":  "duo",
-        "name_1":  "OM NARAYAN MISHRA"
-    },
-    {
-        "pass_serial":  "911",
-        "name_2":  "PRAKHAR PATIL",
-        "entry_type":  "duo",
-        "name_1":  "SHRAJAN CHAURASIA"
-    },
-    {
-        "pass_serial":  "915",
-        "name_2":  "GAURI DIXIT",
-        "entry_type":  "duo",
-        "name_1":  "PRACHI CHOURI"
-    },
-    {
-        "pass_serial":  "917",
-        "name_2":  "-----",
-        "entry_type":  "duo",
-        "name_1":  "SANDEEP MEENA"
-    },
-    {
-        "pass_serial":  "920",
-        "name_2":  "RAGHVENDRA CHAUHAN",
-        "entry_type":  "duo",
-        "name_1":  "SEJAL GUPTA"
-    },
-    {
-        "pass_serial":  "924",
-        "name_2":  "PURNIMA MEENA",
-        "entry_type":  "duo",
-        "name_1":  "YUVRAJ SINGH KUSHWAHA"
-    },
-    {
-        "pass_serial":  "925",
-        "name_2":  "VAISHNAVI KAITHWAR",
-        "entry_type":  "duo",
-        "name_1":  "DIVYANSH SHUKLA"
-    },
-    {
-        "pass_serial":  "926",
-        "name_2":  "KHUSHI KUMARI",
-        "entry_type":  "duo",
-        "name_1":  "SIMRAN SHAH"
-    },
-    {
-        "pass_serial":  "928",
-        "name_2":  "AASTHA SONI",
-        "entry_type":  "duo",
-        "name_1":  "PALAK JAIN"
-    },
-    {
-        "pass_serial":  "935",
-        "name_2":  "ARJUN SHARMA",
-        "entry_type":  "duo",
-        "name_1":  "PRIYANKA JOSHI"
-    },
-    {
-        "pass_serial":  "936",
-        "name_2":  "ANSH TIWARI",
-        "entry_type":  "duo",
-        "name_1":  "HARSHIT JAIN"
-    },
-    {
-        "pass_serial":  "937",
-        "name_2":  "NIVEDITA TIWARI",
-        "entry_type":  "duo",
-        "name_1":  "AAROHI SIKARWAL"
-    },
-    {
-        "pass_serial":  "938",
-        "name_2":  "SIDHI MALIK",
-        "entry_type":  "duo",
-        "name_1":  "SOHINI SAXENA"
-    },
-    {
-        "pass_serial":  "939",
-        "name_2":  "ANSHIKA SINGH",
-        "entry_type":  "duo",
-        "name_1":  "PRATIKSHA SINGH"
-    },
-    {
-        "pass_serial":  "940",
-        "name_2":  "AARY VEER SHIIKARWAR",
-        "entry_type":  "duo",
-        "name_1":  "SAKSHI RAI"
-    },
-    {
-        "pass_serial":  "943",
-        "name_2":  "SAHIL RAIKWAR",
-        "entry_type":  "duo",
-        "name_1":  "ROSE RAJAK"
-    },
-    {
-        "pass_serial":  "949",
-        "name_2":  "MAYANK VERMA",
-        "entry_type":  "duo",
-        "name_1":  "AKSHAT AGNIHOTRI"
-    },
-    {
-        "pass_serial":  "951",
-        "name_2":  "DEEPA SHAH",
-        "entry_type":  "duo",
-        "name_1":  "NISHIKA SINNGH"
-    },
-    {
-        "pass_serial":  "953",
-        "name_2":  "ASHWINI SHRIVASTAV",
-        "entry_type":  "duo",
-        "name_1":  "TANMAY SINGH"
-    },
-    {
-        "pass_serial":  "966",
-        "name_2":  "JIGAR CHOUHAN",
-        "entry_type":  "duo",
-        "name_1":  "KRITIKA TIWARI"
-    },
-    {
-        "pass_serial":  "969",
-        "name_2":  "JAYDIP SINGH SOLANKI",
-        "entry_type":  "duo",
-        "name_1":  "JATIN MEENA"
-    },
-    {
-        "pass_serial":  "970",
-        "name_2":  "ISHIKA SHARMA",
-        "entry_type":  "duo",
-        "name_1":  "SHRISTI  MAKORAYA"
-    },
-    {
-        "pass_serial":  "975",
-        "name_2":  "DEV KUMAR",
-        "entry_type":  "duo",
-        "name_1":  "SIDHIKA PATHAK"
-    },
-    {
-        "pass_serial":  "982",
-        "name_2":  "ANUSHIKA MISHRA",
-        "entry_type":  "duo",
-        "name_1":  "VANSHIKA DAHAIYA"
-    },
-    {
-        "pass_serial":  "985",
-        "name_2":  "KRISHNA HARJANDANI",
-        "entry_type":  "duo",
-        "name_1":  "CHINMAY K AJIT"
-    },
-    {
-        "pass_serial":  "986",
-        "name_2":  "SOHANI PRAJAPATI",
-        "entry_type":  "duo",
-        "name_1":  "JYOTI PATWA"
-    },
-    {
-        "pass_serial":  "988",
-        "name_2":  "UDITA MEHRA",
-        "entry_type":  "duo",
-        "name_1":  "KRISH MEHRA"
-    },
-    {
-        "pass_serial":  "989",
-        "name_2":  "SNEHA BAHOTRA",
-        "entry_type":  "duo",
-        "name_1":  "VAISHNAVI GUPTA"
-    },
-    {
-        "pass_serial":  "994",
-        "name_2":  "SHAILA ANSARI",
-        "entry_type":  "duo",
-        "name_1":  "MONISH ANSARI"
-    },
-    {
-        "pass_serial":  "995",
-        "name_2":  "ANIKET JAIN",
-        "entry_type":  "duo",
-        "name_1":  "YASHASHVI INGLY"
-    },
-    {
-        "pass_serial":  "998",
-        "name_2":  "MEHEK CHOUDARY",
-        "entry_type":  "duo",
-        "name_1":  "KHUSHI KUMARI"
-    }
+  {
+    "pass_serial": "003",
+    "name_1": "RIYA PANDEY",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "007",
+    "name_1": "SHUBH SEN",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "022",
+    "name_1": "PRATEEK KARDE",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "023",
+    "name_1": "KHUSHI SAINI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "027",
+    "name_1": "SOMYA JOSHI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "028",
+    "name_1": "ADITI SINGH",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "029",
+    "name_1": "PUSHPAM PANDEY",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "030",
+    "name_1": "RAKHI SAHU",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "034",
+    "name_1": "KANISHKA PARIHAR",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "051",
+    "name_1": "PRIYANSHU BUNDELA",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "054",
+    "name_1": "NANCY MEENA",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "058",
+    "name_1": "RANJANA DANGE",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "063",
+    "name_1": "ASMI SINGH",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "064",
+    "name_1": "PRANJAL JAIN",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "075",
+    "name_1": "PRACHI CHOUKIKAR",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "091",
+    "name_1": "SHREYANSH MARAVI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "094",
+    "name_1": "ISHITA SWARNKAR",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "108",
+    "name_1": "SHASHANK KASHYAP",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "149",
+    "name_1": "ANSHIKA TIWARI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "151",
+    "name_1": "VAIBHAV MAHENDRA GUPTA",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "171",
+    "name_1": "VASHNAVI PRAJAPATI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "177",
+    "name_1": "DISHITA SACHDEV",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "184",
+    "name_1": "SAHIL SONI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "193",
+    "name_1": "ROSHNI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "196",
+    "name_1": "PANKHUDI BHOSLE",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "402",
+    "name_1": "SANSKAR SHARMA",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "403",
+    "name_1": "ANKUR SONI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "406",
+    "name_1": "KRISH SOLANKI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "408",
+    "name_1": "GURPREET KOUR",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "409",
+    "name_1": "YOGESH YADAV",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "411",
+    "name_1": "YOGENDRA SINGH",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "412",
+    "name_1": "VASHNAVI VISHWAKARMA",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "416",
+    "name_1": "PRATIKSHA DANDGE",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "417",
+    "name_1": "NIKHAR AGARWAL",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "419",
+    "name_1": "NIRAJ PACHORI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "423",
+    "name_1": "AKSHITA MAHESHWARI",
+    "name_2": null,
+    "entry_type": "stag"
+  },
+  {
+    "pass_serial": "005",
+    "name_1": "KASHISH SINGHARIA",
+    "name_2": "NAINA PANCHAL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "006",
+    "name_1": "ROSHNI BHADORIYA",
+    "name_2": "RAJ SINGH BHAGEDI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "019",
+    "name_1": "ROUNAK MAKRAYA",
+    "name_2": "MAHIMASEN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "025",
+    "name_1": "PRIYANSHU PRASHANT",
+    "name_2": "SAHARSH TIWARI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "026",
+    "name_1": "SWAPNIL MEENA",
+    "name_2": "ANJALI HASIJA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "033",
+    "name_1": "ROHIT PATEL",
+    "name_2": "SIMRAN KUSHWAHA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "039",
+    "name_1": "DEVRAJ SINGH CHOUHAN",
+    "name_2": "TANISHA BAND",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "040",
+    "name_1": "PRIYANSHI CHAWLA",
+    "name_2": "VAIDHI PARMAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "062",
+    "name_1": "RANI CHOURASHIYA",
+    "name_2": "ROSHINI MEENA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "068",
+    "name_1": "DEV LODHI",
+    "name_2": "ANSH YADAV",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "073",
+    "name_1": "GAUTAM SHAH",
+    "name_2": "VINOD SHAH",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "081",
+    "name_1": "RIJAK GUMBER",
+    "name_2": "VINAYAK SHARMA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "082",
+    "name_1": "SWAYAM RAJPUT",
+    "name_2": "SHIVANGI DHAKAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "089",
+    "name_1": "RIYA PATEL",
+    "name_2": "SANJANA PATEL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "099",
+    "name_1": "RUDRA PRATAP SINGH",
+    "name_2": "ANJALI SONI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "108",
+    "name_1": "PAYAL SINGH",
+    "name_2": "PRINCE PATEL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "110",
+    "name_1": "PRAGATI KUSHWAHA",
+    "name_2": "PUJA MANDAL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "132",
+    "name_1": "MANISHA MEENA",
+    "name_2": "AASHI RAGHUVANSHI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "137",
+    "name_1": "AVIKA ARTHEY",
+    "name_2": "AKANSHA KHARE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "152",
+    "name_1": "KHUSHI THAKUR",
+    "name_2": "RAGHAV SRIVASTAVA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "156",
+    "name_1": "AASTHA BAGHEL",
+    "name_2": "ISHAN PATEL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "157",
+    "name_1": "VINEET TIWARI",
+    "name_2": "ISHIKA SAHANE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "158",
+    "name_1": "AMAR DANDE",
+    "name_2": "HARSHITA JADHAV",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "160",
+    "name_1": "SARVAGYA KUSHWAHA",
+    "name_2": "DIVYANI JADHAV",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "166",
+    "name_1": "SHIVANGI GUPTA",
+    "name_2": "AMAN GAUTAM",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "172",
+    "name_1": "ISHIKA TIWARI",
+    "name_2": "MANTHAN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "178",
+    "name_1": "KANAK ANDANI",
+    "name_2": "HARSH VARDHAN PATEL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "179",
+    "name_1": "ADITI BATHA",
+    "name_2": "RITIK CHAUHAN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "181",
+    "name_1": "ARYAN KUMAR SINGH",
+    "name_2": "SAKSHI DANGI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "182",
+    "name_1": "RAM DETHLIYA",
+    "name_2": "ADITYA AMAN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "183",
+    "name_1": "ASHI RATHORE",
+    "name_2": "KRISHIKA KUMARI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "184",
+    "name_1": "SHIVI TIWARI",
+    "name_2": "HIMANI YEDE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "195",
+    "name_1": "SHAGUN VERMA",
+    "name_2": "NIKITA KUNDELKAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "196",
+    "name_1": "NIRANJANA SINGH",
+    "name_2": "STUTI SAXENA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "222",
+    "name_1": "CHARVI CHOURASIYA",
+    "name_2": "ABIRA SAXENA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "225",
+    "name_1": "BHAVESH KARADE",
+    "name_2": "NIKHIL RAGHUWANSHI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "229",
+    "name_1": "AARAV DUBEY",
+    "name_2": "ARYAN KUMAR SINGH",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "272",
+    "name_1": "PRASIKH  SAHU",
+    "name_2": "ISHAN TAYADE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "275",
+    "name_1": "SAMARENDRA SINGH",
+    "name_2": "PRANJAL MAHAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "276",
+    "name_1": "YATISH  VISHWAKARMA",
+    "name_2": "YOGESH YADAV",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "277",
+    "name_1": "KANISHKA SHARMA",
+    "name_2": "ABHISHEK RAJAWAT",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "281",
+    "name_1": "ARSIF KHAN",
+    "name_2": "MEHER MALVIYA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "282",
+    "name_1": "KRISHNA PRATAP SINGH",
+    "name_2": "ANUPAM KUMAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "283",
+    "name_1": "ANUKALP SHARMA",
+    "name_2": "ADDYA DIWEDI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "284",
+    "name_1": "KANIKA GAWANDE",
+    "name_2": "OSHIN XALXO",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "285",
+    "name_1": "KANAK VAERMAN",
+    "name_2": "POONAM PANCHESHWAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "291",
+    "name_1": "ANANYA RATHODE",
+    "name_2": "ABHINAY SIGH RATHODE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "296",
+    "name_1": "ANKUSH SHAH",
+    "name_2": "AMAN JAISWAL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "300",
+    "name_1": "VANSHIKA PARMAR",
+    "name_2": "RADHA PATHAK",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "307",
+    "name_1": "SHIVANI KUMARI",
+    "name_2": "SHREYA PATEL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "310",
+    "name_1": "PIYUSH YADAV",
+    "name_2": "ANKIT SHARMA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "314",
+    "name_1": "VIVEK SINGH",
+    "name_2": "SWATI KORRAM",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "315",
+    "name_1": "SUMAN GUPTA",
+    "name_2": "RATNA SINGH",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "316",
+    "name_1": "AJAY SINGH RAJPUT",
+    "name_2": "PRATYAKSH MAITHIL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "317",
+    "name_1": "KUSHI PAWAR",
+    "name_2": "PRIYANSHI SINHG",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "323",
+    "name_1": "GOURAV DEHARYA",
+    "name_2": "SACHINN MEENA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "325",
+    "name_1": "NANDANI DUBEY",
+    "name_2": "MAYANK PATEL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "334",
+    "name_1": "HUZEFA MOHOMMMAD",
+    "name_2": "VAISHNAVI SEN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "335",
+    "name_1": "ADITI DIXIT",
+    "name_2": "PRANJALI MANDLOY",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "336",
+    "name_1": "KANISHCA KOSTA",
+    "name_2": "SOMESH MEHRA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "337",
+    "name_1": "SONAKSHI SALVE",
+    "name_2": "SANKET SRIVASTAVA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "340",
+    "name_1": "ANKITA PANDIT",
+    "name_2": "MAHI JHA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "345",
+    "name_1": "ROHAN VERMA",
+    "name_2": "GARIMA JAISWAL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "349",
+    "name_1": "VIBHA BARMAN",
+    "name_2": "RADHIKA YADUWANSHI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "362",
+    "name_1": "CHHAYANK JOSHI",
+    "name_2": "PRIYANSHU BANURIYA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "363",
+    "name_1": "MARIYAM KHAN",
+    "name_2": "JATIN SHRIVASYAV",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "364",
+    "name_1": "ISHIKA MISHRA",
+    "name_2": "PALAK SAHU",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "365",
+    "name_1": "TANMAY SONI",
+    "name_2": "APARNA VISWAKARA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "368",
+    "name_1": "OJASWANI KHATRI",
+    "name_2": "AADHYA RAI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "369",
+    "name_1": "SHIVAM KUMAR PATEL",
+    "name_2": "SURGESH AHIRWAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "370",
+    "name_1": "KHUSHI PANDEY",
+    "name_2": "KASHVI LODHI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "371",
+    "name_1": "PRISHA AGNIOTRI",
+    "name_2": "FARDEEN QUORESHI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "375",
+    "name_1": "HARSHVARDHANT GAIKWARD",
+    "name_2": "ABHISHAKE SINGH",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "376",
+    "name_1": "JAIYESH BIYANI",
+    "name_2": "PAVITRA BIDUA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "391",
+    "name_1": "SANJANA YADAV",
+    "name_2": "PRIYANSHU RATHORE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "401",
+    "name_1": "NANDINI MORE",
+    "name_2": "DIYA PARDARSHINI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "405",
+    "name_1": "NOMAN KHAN",
+    "name_2": "KRISHNA DWAIDI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "406",
+    "name_1": "ARMAN RAJA",
+    "name_2": "----",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "413",
+    "name_1": "PARNJALI FALKE",
+    "name_2": "VIDYA PATLE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "414",
+    "name_1": "SHRUTI PATANKAR",
+    "name_2": "RITU AMRUTE",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "423",
+    "name_1": "RITIKA TIWARI",
+    "name_2": "ABHISHAEK MEENA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "424",
+    "name_1": "EKTA BANJARA",
+    "name_2": "NIRJALA NETAM",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "426",
+    "name_1": "KRISH SONARE",
+    "name_2": "SWAYAM RAGHUWANSHI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "427",
+    "name_1": "DIVYANSHI VERMA",
+    "name_2": "ADITYA LOWANSHI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "429",
+    "name_1": "ANSHIKA JHA",
+    "name_2": "----",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "433",
+    "name_1": "ARSHITA DARYANI",
+    "name_2": "HARSHITA JAISWAL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "440",
+    "name_1": "EKTA LOWANSHI",
+    "name_2": "YASH WARULA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "441",
+    "name_1": "TANISHQA BAIRAGI",
+    "name_2": "PURTI MISHRA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "442",
+    "name_1": "UDITA LOWANSHI",
+    "name_2": "RUPAL DHURVAY",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "443",
+    "name_1": "VANSHIKA BAIGA",
+    "name_2": "RIYA SIKANIYA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "501",
+    "name_1": "MADHUR TAMRAKAR",
+    "name_2": "ANUSHRI SEN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "503",
+    "name_1": "KUNAL RATHORE",
+    "name_2": "-----",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "504",
+    "name_1": "VISHAL VISHWAKARMA",
+    "name_2": "RADHIKA MEHER",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "903",
+    "name_1": "SANSKAR NIRWAHA",
+    "name_2": "KAVYANSH SRIVASTAVA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "910",
+    "name_1": "OM NARAYAN MISHRA",
+    "name_2": "RITESH PATEL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "911",
+    "name_1": "SHRAJAN CHAURASIA",
+    "name_2": "PRAKHAR PATIL",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "915",
+    "name_1": "PRACHI CHOURI",
+    "name_2": "GAURI DIXIT",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "917",
+    "name_1": "SANDEEP MEENA",
+    "name_2": "-----",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "920",
+    "name_1": "SEJAL GUPTA",
+    "name_2": "RAGHVENDRA CHAUHAN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "924",
+    "name_1": "YUVRAJ SINGH KUSHWAHA",
+    "name_2": "PURNIMA MEENA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "925",
+    "name_1": "DIVYANSH SHUKLA",
+    "name_2": "VAISHNAVI KAITHWAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "926",
+    "name_1": "SIMRAN SHAH",
+    "name_2": "KHUSHI KUMARI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "928",
+    "name_1": "PALAK JAIN",
+    "name_2": "AASTHA SONI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "935",
+    "name_1": "PRIYANKA JOSHI",
+    "name_2": "ARJUN SHARMA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "936",
+    "name_1": "HARSHIT JAIN",
+    "name_2": "ANSH TIWARI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "937",
+    "name_1": "AAROHI SIKARWAL",
+    "name_2": "NIVEDITA TIWARI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "938",
+    "name_1": "SOHINI SAXENA",
+    "name_2": "SIDHI MALIK",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "939",
+    "name_1": "PRATIKSHA SINGH",
+    "name_2": "ANSHIKA SINGH",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "940",
+    "name_1": "SAKSHI RAI",
+    "name_2": "AARY VEER SHIIKARWAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "943",
+    "name_1": "ROSE RAJAK",
+    "name_2": "SAHIL RAIKWAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "949",
+    "name_1": "AKSHAT AGNIHOTRI",
+    "name_2": "MAYANK VERMA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "951",
+    "name_1": "NISHIKA SINNGH",
+    "name_2": "DEEPA SHAH",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "953",
+    "name_1": "TANMAY SINGH",
+    "name_2": "ASHWINI SHRIVASTAV",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "966",
+    "name_1": "KRITIKA TIWARI",
+    "name_2": "JIGAR CHOUHAN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "969",
+    "name_1": "JATIN MEENA",
+    "name_2": "JAYDIP SINGH SOLANKI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "970",
+    "name_1": "SHRISTI  MAKORAYA",
+    "name_2": "ISHIKA SHARMA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "975",
+    "name_1": "SIDHIKA PATHAK",
+    "name_2": "DEV KUMAR",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "982",
+    "name_1": "VANSHIKA DAHAIYA",
+    "name_2": "ANUSHIKA MISHRA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "985",
+    "name_1": "CHINMAY K AJIT",
+    "name_2": "KRISHNA HARJANDANI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "986",
+    "name_1": "JYOTI PATWA",
+    "name_2": "SOHANI PRAJAPATI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "988",
+    "name_1": "KRISH MEHRA",
+    "name_2": "UDITA MEHRA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "989",
+    "name_1": "VAISHNAVI GUPTA",
+    "name_2": "SNEHA BAHOTRA",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "994",
+    "name_1": "MONISH ANSARI",
+    "name_2": "SHAILA ANSARI",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "995",
+    "name_1": "YASHASHVI INGLY",
+    "name_2": "ANIKET JAIN",
+    "entry_type": "duo"
+  },
+  {
+    "pass_serial": "998",
+    "name_1": "KHUSHI KUMARI",
+    "name_2": "MEHEK CHOUDARY",
+    "entry_type": "duo"
+  }
 ]
