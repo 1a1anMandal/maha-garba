@@ -100,7 +100,7 @@ export default function GateEntry() {
 
       let duplicateInfo = null;
       if (matches) {
-        const diffPass = matches.find(m => !(m.pass_serial === passSerial && m.entry_type === entryType));
+        const diffPass = matches.find(m => m.pass_serial.split('_')[0] !== passSerial);
         if (diffPass) duplicateInfo = diffPass;
       }
       
@@ -130,7 +130,7 @@ export default function GateEntry() {
       .from('entries')
       .insert([
         {
-          pass_serial: passSerial,
+          pass_serial: `${passSerial}_${entryType}_${date}`,
           name_1: name1,
           name_2: entryType === "duo" ? name2 : null,
           entry_type: entryType,

@@ -84,13 +84,13 @@ export default function AdminDashboard() {
   };
   
   const filteredData = entries.filter(d => {
-    const matchesSearch = d.pass_serial.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch = d.pass_serial.split('_')[0].toLowerCase().includes(searchTerm.toLowerCase()) || 
                           d.name_1.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           (d.name_2 && d.name_2.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesDate = filterDate === "all" || d.entry_date === filterDate;
     const matchesType = filterType === "all" || d.entry_type === filterType;
     return matchesSearch && matchesDate && matchesType;
-  }).sort((a, b) => (a.pass_serial || "").localeCompare(b.pass_serial || "", undefined, { numeric: true }));
+  }).sort((a, b) => (a.pass_serial ? a.pass_serial.split('_')[0] : "").localeCompare(b.pass_serial ? b.pass_serial.split('_')[0] : "", undefined, { numeric: true }));
 
   const totalEntries = entries.length;
   const stagCount = entries.filter(e => e.entry_type === 'stag').length;
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
       }
       
       // Sort by Pass Number
-      dataToExport = [...dataToExport].sort((a, b) => (a.pass_serial || "").localeCompare(b.pass_serial || "", undefined, { numeric: true }));
+      dataToExport = [...dataToExport].sort((a, b) => (a.pass_serial ? a.pass_serial.split('_')[0] : "").localeCompare(b.pass_serial ? b.pass_serial.split('_')[0] : "", undefined, { numeric: true }));
       
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet('Attendance');
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
       dataToExport.forEach(row => {
         const timeStr = new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
         const dataRow = sheet.addRow([
-          row.pass_serial,
+            row.pass_serial.split('_')[0],
           row.name_1,
           row.name_2 || '',
           row.entry_date,
@@ -356,7 +356,7 @@ export default function AdminDashboard() {
                         className={`hover:bg-white/5 transition-colors cursor-pointer ${expandedRowId === row.id ? 'bg-white/5' : ''}`}
                         onClick={() => setExpandedRowId(expandedRowId === row.id ? null : row.id)}
                       >
-                        <td className="px-6 py-4 font-mono text-garba-gold">{row.pass_serial}</td>
+                        <td className="px-6 py-4 font-mono text-garba-gold">{row.pass_serial.split('_')[0]}</td>
                         <td className="px-6 py-4 font-semibold">
                           {row.name_1} {row.name_2 && <span className="text-garba-light/80"><br/>& {row.name_2}</span>}
                         </td>
@@ -377,9 +377,9 @@ export default function AdminDashboard() {
                         <tr className="bg-black/40">
                           <td colSpan={6} className="px-6 py-4 border-t-0">
                             <div className="flex flex-col gap-3 p-2">
-                              <h4 className="text-garba-gold text-sm font-bold uppercase tracking-wider">Attendance History for Pass {row.pass_serial}</h4>
+                              <h4 className="text-garba-gold text-sm font-bold uppercase tracking-wider">Attendance History for Pass {row.pass_serial.split('_')[0]}</h4>
                               <div className="flex flex-wrap gap-2">
-                                {entries.filter(e => e.pass_serial === row.pass_serial).sort((a,b) => a.entry_date.localeCompare(b.entry_date)).map(historyEntry => (
+                                {entries.filter(e => e.pass_serial.split('_')[0] === row.pass_serial.split('_')[0] && e.entry_type === row.entry_type).sort((a,b) => a.entry_date.localeCompare(b.entry_date)).map(historyEntry => (
                                   <span key={historyEntry.id} className="bg-white/10 text-garba-light px-3 py-1.5 rounded-lg border border-white/20 text-sm flex items-center gap-2">
                                     <Calendar className="w-3 h-3 text-garba-gold" />
                                     {historyEntry.entry_date}
