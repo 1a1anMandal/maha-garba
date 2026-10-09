@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, CheckCircle2, AlertCircle, User, Users, Calendar, Ticket, LogOut } from "lucide-react";
+import { DandiyaIcon } from "@/components/DandiyaIcon";
 
 import { supabase } from "@/lib/supabase";
 
@@ -86,29 +87,32 @@ export default function GateEntry() {
     <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
       
       {/* Decorative Header */}
-      <div className="text-center mb-8 animate-fade-in relative w-full max-w-md">
+      <div className="text-center mb-8 animate-fade-in flex flex-col items-center relative w-full max-w-md">
         <button onClick={handleLogout} className="absolute right-0 top-0 text-garba-light/60 hover:text-white transition-colors" title="Logout">
           <LogOut className="w-6 h-6" />
         </button>
+        <DandiyaIcon className="w-16 h-16 mb-2" />
         <h1 className="text-4xl sm:text-6xl font-black text-garba-gold text-glow uppercase tracking-wider font-[family-name:var(--font-rozha)]">
           Maha Garba
         </h1>
-        <p className="text-garba-light text-xl mt-2 tracking-widest font-semibold uppercase">
-          Entry Management
-        </p>
+        <div className="subtitle-lines w-full mt-2">
+          <p className="text-garba-light text-sm sm:text-base tracking-[0.3em] font-semibold uppercase whitespace-nowrap px-4">
+            Entry Management
+          </p>
+        </div>
       </div>
 
       {/* Main Entry Card */}
-      <div className={`w-full max-w-md bg-garba-maroon rounded-2xl shadow-2xl overflow-hidden border-2 transition-colors duration-500 ${
-          status === "success" ? "border-garba-green shadow-[0_0_40px_rgba(12,87,42,0.6)]" : 
-          status === "duplicate" ? "border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.6)]" : 
-          "border-garba-gold/30"
+      <div className={`w-full max-w-md ornate-card transition-all duration-500 ${
+          status === "success" ? "border-garba-green shadow-[0_0_40px_rgba(21,109,53,0.8)]" : 
+          status === "duplicate" ? "border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.8)]" : 
+          ""
         }`}>
         
         {/* Top border dots */}
         <div className="border-dots opacity-50 mt-4 mx-4"></div>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-6 sm:p-8 pt-4">
           
           {/* Status Banners */}
           {status === "success" && (

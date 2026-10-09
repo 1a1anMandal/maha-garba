@@ -86,7 +86,7 @@ export default function AdminDashboard() {
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-center bg-garba-maroon border-2 border-garba-gold/30 rounded-2xl p-6 shadow-xl">
+        <header className="flex flex-col sm:flex-row justify-between items-center ornate-card p-6">
           <div className="flex items-center gap-4">
             <div className="bg-garba-gold p-3 rounded-xl">
               <LayoutDashboard className="w-8 h-8 text-garba-maroon" />
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
 
         {/* Dynamic Section */}
         {activeTab === 'entries' ? (
-          <div className="bg-garba-maroon border-2 border-garba-gold/30 rounded-2xl shadow-xl overflow-hidden flex flex-col animate-fade-in-down">
+          <div className="ornate-card overflow-hidden flex flex-col animate-fade-in-down">
             <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
               <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Recent Entries</h2>
               <div className="relative w-full sm:w-72">
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
             </div>
           </div>
         ) : (
-          <div className="bg-garba-maroon border-2 border-garba-gold/30 rounded-2xl shadow-xl overflow-hidden flex flex-col animate-fade-in-down">
+          <div className="ornate-card overflow-hidden flex flex-col animate-fade-in-down">
             <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
               <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Pending Operator Requests</h2>
             </div>
@@ -248,7 +248,7 @@ function StatCard({ title, value, icon, color }: { title: string, value: string,
                   color === 'blue-400' ? 'bg-blue-400/10' : 'bg-purple-400/10';
 
   return (
-    <div className="bg-garba-maroon border border-garba-gold/20 rounded-2xl p-6 flex items-center gap-4 hover:border-garba-gold/50 transition-colors shadow-lg">
+    <div className="ornate-card p-6 flex items-center gap-4 hover:border-garba-gold/80 transition-colors">
       <div className={`p-4 rounded-xl ${bgColor} ${iconColor}`}>
         {icon}
       </div>

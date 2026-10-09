@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-garba-red: #8B0000;
-  --color-garba-darkred: #660000;
-  --color-garba-maroon: #5C0A0A;
-  --color-garba-gold: #FFE600;
-  --color-garba-green: #0c572a;
-  --color-garba-light: #FFF8D6;
+  --color-garba-red: #8c0909;
+  --color-garba-darkred: #4a0303;
+  --color-garba-maroon: #2d0000;
+  --color-garba-gold: #f5b700;
+  --color-garba-goldlight: #ffea70;
+  --color-garba-green: #156d35;
+  --color-garba-light: #fff8e1;
 }
 
 :root {
-  --background: #8B0000;
-  --foreground: #FFF8D6;
+  --background: #1a0000;
+  --foreground: #fff8e1;
 }
 
 body {
@@ -21,35 +22,79 @@ body {
   padding: 0;
 }
 
-/* Background Texture for Paper Crumple Effect */
+/* Rich Background with Spotlight and Mandala Pattern */
 .bg-texture {
-  position: relative;
-  min-height: 100vh;
-  background-color: var(--background);
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(circle at 50% 110%, rgba(245, 183, 0, 0.25) 0%, rgba(140, 9, 9, 0.8) 40%, #1a0000 90%),
+    url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 0 L65 55 L120 60 L65 65 L60 120 L55 65 L0 60 L55 55 Z' fill='%23f5b700' fill-opacity='0.04'/%3E%3Ccircle cx='60' cy='60' r='50' fill='none' stroke='%23f5b700' stroke-width='1' stroke-opacity='0.04' stroke-dasharray='4 4'/%3E%3C/svg%3E");
+  background-attachment: fixed;
+  z-index: -1;
+  pointer-events: none;
 }
 
-.bg-texture::before {
-  content: "";
+/* Base Card Style - Dark translucent with Gold Border */
+.ornate-card {
+  background: rgba(30, 0, 0, 0.85);
+  border: 1px solid rgba(245, 183, 0, 0.3);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(245, 183, 0, 0.05);
+  border-radius: 12px;
+  position: relative;
+  backdrop-filter: blur(12px);
+}
+
+/* Ornate Corner Accents */
+.ornate-card::before, .ornate-card::after {
+  content: '';
   position: absolute;
-  inset: 0;
-  /* SVG noise for texture */
-  background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.15;
-  mix-blend-mode: multiply;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-garba-gold);
   pointer-events: none;
-  z-index: 0;
+  opacity: 0.7;
+}
+
+.ornate-card::before {
+  top: -4px;
+  left: -4px;
+  border-right: none;
+  border-bottom: none;
+  border-top-left-radius: 8px;
+}
+
+.ornate-card::after {
+  bottom: -4px;
+  right: -4px;
+  border-left: none;
+  border-top: none;
+  border-bottom-right-radius: 8px;
 }
 
 /* Text glow shadow for Gold text */
 .text-glow {
-  text-shadow: 2px 2px 0px #5C0A0A, 4px 4px 0px #3a0606;
+  text-shadow: 0 0 20px rgba(245, 183, 0, 0.5), 2px 2px 0px rgba(0,0,0,0.8);
 }
 
 /* Dotted traditional borders */
 .border-dots {
-  background-image: radial-gradient(var(--color-garba-light) 30%, transparent 30%);
-  background-size: 20px 20px;
+  background-image: radial-gradient(rgba(245, 183, 0, 0.4) 30%, transparent 30%);
+  background-size: 16px 16px;
   background-position: center;
   background-repeat: repeat-x;
-  height: 20px;
+  height: 16px;
+}
+
+/* Subtitle lines */
+.subtitle-lines {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+.subtitle-lines::before, .subtitle-lines::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(to right, transparent, rgba(245, 183, 0, 0.5), transparent);
 }

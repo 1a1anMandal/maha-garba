@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Lock, User, UserPlus } from "lucide-react";
+import { DandiyaIcon } from "@/components/DandiyaIcon";
 
 const ADMIN_EMAIL = "milankr.mandal2000@gmail.com";
 
@@ -103,18 +104,21 @@ export default function Login() {
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
-      <div className="text-center mb-8 animate-fade-in-down">
+      <div className="text-center mb-8 animate-fade-in-down flex flex-col items-center">
+        <DandiyaIcon className="w-16 h-16 mb-2" />
         <h1 className="text-4xl sm:text-6xl font-black text-garba-gold text-glow uppercase tracking-wider font-[family-name:var(--font-rozha)]">
           Maha Garba
         </h1>
-        <p className="text-garba-light text-xl mt-2 tracking-widest font-semibold uppercase">
-          Authorized Access
-        </p>
+        <div className="subtitle-lines w-full mt-2">
+          <p className="text-garba-light text-sm sm:text-base tracking-[0.3em] font-semibold uppercase whitespace-nowrap px-4">
+            Authorized Access
+          </p>
+        </div>
       </div>
 
-      <div className="w-full max-w-md bg-garba-maroon rounded-2xl shadow-2xl overflow-hidden border-2 border-garba-gold/30 transition-all duration-300">
+      <div className="w-full max-w-md ornate-card transition-all duration-300">
         <div className="border-dots opacity-50 mt-4 mx-4"></div>
-        <div className="p-8">
+        <div className="p-8 pt-4">
           
           <div className="flex gap-4 mb-6">
             <button 
