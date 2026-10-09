@@ -91,6 +91,20 @@ export default function AdminDashboard() {
     const matchesType = filterType === "all" || d.entry_type === filterType;
     return matchesSearch && matchesDate && matchesType;
   }).sort((a, b) => (a.pass_serial ? a.pass_serial.split('_')[0] : "").localeCompare(b.pass_serial ? b.pass_serial.split('_')[0] : "", undefined, { numeric: true }));
+    const grouped = new Map<string, any>();
+    filteredData.forEach(d => {
+      const key = `${d.pass_serial.split('_')[0]}_${d.entry_type}`;
+      if (!grouped.has(key)) {
+        grouped.set(key, d);
+      } else {
+        const existing = grouped.get(key);
+        if (d.entry_date > existing.entry_date) {
+          grouped.set(key, d);
+        }
+      }
+    });
+    const displayData = Array.from(grouped.values()).sort((a, b) => (a.pass_serial ? a.pass_serial.split('_')[0] : "").localeCompare(b.pass_serial ? b.pass_serial.split('_')[0] : "", undefined, { numeric: true }));
+
 
   const totalEntries = entries.length;
   const stagCount = entries.filter(e => e.entry_type === 'stag').length;
@@ -271,7 +285,7 @@ export default function AdminDashboard() {
           />
           <StatCard 
             title="Current View" 
-            value={filteredData.length.toString()} 
+            value={displayData.length.toString()} 
             icon={<Calendar />} 
             color="purple-400" 
           />
@@ -350,7 +364,7 @@ export default function AdminDashboard() {
                     <tr>
                       <td colSpan={6} className="px-6 py-8 text-center opacity-70 animate-pulse">Loading entries...</td>
                     </tr>
-                  ) : filteredData.map((row) => (
+                  ) : displayData.map((row) => (
                     <Fragment key={row.id}>
                       <tr 
                         className={`hover:bg-white/5 transition-colors cursor-pointer ${expandedRowId === row.id ? 'bg-white/5' : ''}`}
@@ -394,7 +408,7 @@ export default function AdminDashboard() {
                   ))}
                 </tbody>
               </table>
-              {!loading && filteredData.length === 0 && (
+              {!loading && displayData.length === 0 && (
                 <div className="p-8 text-center text-garba-light/50">
                   No entries found matching your filters.
                 </div>
