@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, CheckCircle2, AlertCircle, User, Users, Calendar, Ticket, LogOut } from "lucide-react";
 import { DandiyaIcon } from "@/components/DandiyaIcon";
+import preRegistered from "@/lib/preRegistered.json";
 
 import { supabase } from "@/lib/supabase";
 
@@ -30,6 +31,19 @@ export default function GateEntry() {
     const dd = String(today.getDate()).padStart(2, '0');
     setDate(`${yyyy}-${mm}-${dd}`);
   }, []);
+
+  // Autofill logic
+  useEffect(() => {
+    if (passSerial.length >= 3) {
+      // Allow matching '005' or 'MG-2024-005'
+      const match = preRegistered.find(p => p.pass_serial === passSerial || passSerial.endsWith(p.pass_serial));
+      if (match) {
+        setName1(match.name_1);
+        if (match.name_2) setName2(match.name_2);
+        setEntryType(match.entry_type as "stag" | "duo");
+      }
+    }
+  }, [passSerial]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
