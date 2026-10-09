@@ -85,7 +85,7 @@ export default function GateEntry() {
 
   return (
     <>
-      <div className="bg-app bg-entry"></div>
+      <div className="bg-app"></div>
       <div className="bg-overlay"></div>
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
       

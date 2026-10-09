@@ -82,7 +82,7 @@ export default function AdminDashboard() {
 
   return (
     <>
-      <div className="bg-app bg-admin"></div>
+      <div className="bg-app"></div>
       <div className="bg-overlay"></div>
       <div className="relative z-10 min-h-screen p-4 sm:p-8">
       

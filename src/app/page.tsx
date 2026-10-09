@@ -104,7 +104,7 @@ export default function Login() {
 
   return (
     <>
-      <div className="bg-app bg-login"></div>
+      <div className="bg-app"></div>
       <div className="bg-overlay"></div>
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
       <div className="text-center mb-8 animate-fade-in-down flex flex-col items-center">

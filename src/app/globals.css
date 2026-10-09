@@ -26,41 +26,30 @@ body {
 .bg-app {
   position: fixed;
   inset: 0;
+  background-image: url('/bg-clean.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
-}
-
-.bg-login {
-  background-image: url('/bg-login.jpg');
-}
-
-.bg-entry {
-  background-image: url('/bg-entry.jpg');
-}
-
-.bg-admin {
-  background-image: url('/bg-admin.png');
 }
 
 .bg-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(45, 0, 0, 0.5);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.3);
   z-index: -1;
 }
 
 /* Base Card Style - Dark translucent with Gold Border */
 .ornate-card {
-  background: rgba(30, 0, 0, 0.85);
-  border: 1px solid rgba(245, 183, 0, 0.3);
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(245, 183, 0, 0.05);
+  background: rgba(30, 0, 0, 0.65);
+  border: 1px solid rgba(245, 183, 0, 0.4);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(245, 183, 0, 0.1);
   border-radius: 12px;
   position: relative;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 /* Ornate Corner Accents */
