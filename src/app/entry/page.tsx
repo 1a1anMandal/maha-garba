@@ -18,6 +18,7 @@ export default function GateEntry() {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [duplicateNameWarning, setDuplicateNameWarning] = useState<{pass: string, type: string} | null>(null);
   const [showTypePopup, setShowTypePopup] = useState(false);
   const [pendingMatches, setPendingMatches] = useState<any[]>([]);
 
@@ -74,9 +75,52 @@ export default function GateEntry() {
     router.push('/');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, bypassNameCheck = false) => {
     e.preventDefault();
-    if (!passSerial || !name1 || (entryType === "duo" && !name2)) return;
+    if (!passSerial || !name1) return;
+
+    if (!name1.trim().includes(' ')) {
+      setStatus("error");
+      setErrorMsg("Participant 1 must have a Full Name (First and Last Name).");
+      return;
+    }
+    if (name2 && !name2.trim().includes(' ')) {
+      setStatus("error");
+      setErrorMsg("Participant 2 must have a Full Name (First and Last Name).");
+      return;
+    }
+
+    if (!bypassNameCheck) {
+      const orQuery = `name_1.ilike."${name1.trim()}",name_2.ilike."${name1.trim()}"` + (name2 ? `,name_1.ilike."${name2.trim()}",name_2.ilike."${name2.trim()}"` : "");
+      const { data: matches } = await supabase
+        .from('entries')
+        .select('pass_serial, entry_type')
+        .or(orQuery)
+        .limit(10); // Fetch a few to find one that is truly a different pass
+
+      let duplicateInfo = null;
+      if (matches) {
+        const diffPass = matches.find(m => !(m.pass_serial === passSerial && m.entry_type === entryType));
+        if (diffPass) duplicateInfo = diffPass;
+      }
+      
+      if (!duplicateInfo) {
+        const dupLocal = preRegistered.find(p => 
+          !(p.pass_serial === passSerial && p.entry_type === entryType) && 
+          (p.name_1.toLowerCase() === name1.trim().toLowerCase() || 
+           (p.name_2 && p.name_2.toLowerCase() === name1.trim().toLowerCase()) ||
+           (name2 && p.name_1.toLowerCase() === name2.trim().toLowerCase()) ||
+           (name2 && p.name_2 && p.name_2.toLowerCase() === name2.trim().toLowerCase())
+          )
+        );
+        if (dupLocal) duplicateInfo = dupLocal;
+      }
+
+      if (duplicateInfo) {
+        setDuplicateNameWarning({ pass: duplicateInfo.pass_serial, type: duplicateInfo.entry_type });
+        return;
+      }
+    }
 
     setLoading(true);
     setStatus("idle");
@@ -199,6 +243,37 @@ export default function GateEntry() {
               >
                 Dismiss
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Duplicate Name Warning Popup */}
+      {duplicateNameWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
+          <div className="bg-garba-darkred text-white p-8 rounded-2xl flex flex-col items-center gap-4 shadow-2xl max-w-sm w-full mx-4 border-2 border-yellow-500">
+            <AlertCircle className="w-16 h-16 shrink-0 text-yellow-500" />
+            <div className="text-center">
+              <p className="font-black text-2xl uppercase tracking-wider text-yellow-500">Name Exists!</p>
+              <p className="text-lg opacity-90 mt-2">Name already exists under a different pass.</p>
+              <p className="font-bold text-xl text-white mt-2">Pass: {duplicateNameWarning.type.toUpperCase()} {duplicateNameWarning.pass}</p>
+              <div className="flex flex-col gap-3 mt-6">
+                <button 
+                  onClick={() => setDuplicateNameWarning(null)}
+                  className="w-full bg-white text-garba-darkred px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-lg active:scale-95"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={(e) => {
+                    setDuplicateNameWarning(null);
+                    handleSubmit(e as any, true);
+                  }}
+                  className="w-full bg-transparent border border-white/30 text-white/70 px-6 py-3 rounded-xl font-bold hover:bg-white/10 transition active:scale-95"
+                >
+                  Proceed Anyway
+                </button>
+              </div>
             </div>
           </div>
         </div>
