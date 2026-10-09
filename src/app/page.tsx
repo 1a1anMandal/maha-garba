@@ -212,6 +212,7 @@ export default function Login() {
         </div>
         <div className="border-dots opacity-50 mb-4 mx-4"></div>
       </div>
+    </div>
     </>
   );
 }
