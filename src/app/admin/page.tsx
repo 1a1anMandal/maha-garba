@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Users, User, Ticket, Calendar, Download, Search, LayoutDashboard, LogOut } from "lucide-react";
+import { Users, User, Ticket, Calendar, Download, Search, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -11,6 +13,14 @@ export default function AdminDashboard() {
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"entries" | "requests">("entries");
+  
+  // New Filters
+  const [filterDate, setFilterDate] = useState<string>("all");
+  const [filterType, setFilterType] = useState<"all" | "stag" | "duo">("all");
+  
+  // Export State
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -70,15 +80,87 @@ export default function AdminDashboard() {
     fetchRequests();
   };
   
-  const filteredData = entries.filter(d => 
-    d.pass_serial.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    d.name_1.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (d.name_2 && d.name_2.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredData = entries.filter(d => {
+    const matchesSearch = d.pass_serial.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          d.name_1.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (d.name_2 && d.name_2.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesDate = filterDate === "all" || d.entry_date === filterDate;
+    const matchesType = filterType === "all" || d.entry_type === filterType;
+    return matchesSearch && matchesDate && matchesType;
+  });
 
   const totalEntries = entries.length;
   const stagCount = entries.filter(e => e.entry_type === 'stag').length;
   const duoCount = entries.filter(e => e.entry_type === 'duo').length;
+  
+  const uniqueDates = Array.from(new Set(entries.map(e => e.entry_date))).sort((a, b) => (b as string).localeCompare(a as string));
+
+  const handleExport = async (exportType: 'all' | 'filtered') => {
+    setIsExporting(true);
+    setExportMenuOpen(false);
+    try {
+      const dataToExport = exportType === 'all' ? entries : filteredData;
+      
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet('Attendance');
+
+      // Title Row
+      const titleRow = sheet.addRow([`GARBA WORKSHOP ATTENDANCE — ${filterType === 'all' ? 'ALL' : filterType.toUpperCase()} PASS — ${filterDate === 'all' ? 'ALL DATES' : filterDate}`]);
+      titleRow.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
+      titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
+      titleRow.height = 30;
+      sheet.mergeCells('A1:E1');
+      titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF800000' } };
+
+      // Header Row
+      const headerRow = sheet.addRow(['Pass Number', 'Name', 'Name 2', 'Entry Date', 'Time']);
+      headerRow.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+      headerRow.height = 20;
+      
+      headerRow.eachCell((cell) => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF800000' } };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = {
+          top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }
+        };
+      });
+
+      // Columns Width
+      sheet.getColumn(1).width = 20;
+      sheet.getColumn(2).width = 30;
+      sheet.getColumn(3).width = 30;
+      sheet.getColumn(4).width = 15;
+      sheet.getColumn(5).width = 15;
+
+      // Data Rows
+      dataToExport.forEach(row => {
+        const timeStr = new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+        const dataRow = sheet.addRow([
+          row.pass_serial,
+          row.name_1,
+          row.name_2 || '',
+          row.entry_date,
+          timeStr
+        ]);
+        
+        dataRow.eachCell((cell) => {
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = {
+            top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }
+          };
+        });
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, `Maha_Garba_${exportType === 'all' ? 'All' : 'Filtered'}_Entries.xlsx`);
+      
+    } catch (e) {
+      console.error(e);
+      alert('Error exporting data');
+    }
+    setIsExporting(false);
+  };
 
   return (
     <>
@@ -101,22 +183,67 @@ export default function AdminDashboard() {
               <p className="text-garba-light/80 font-semibold tracking-wide">Maha Garba Event Management</p>
             </div>
           </div>
-          <div className="flex gap-3 mt-4 sm:mt-0">
-            <button className="flex items-center gap-2 bg-garba-gold text-garba-maroon px-6 py-2 rounded-xl font-bold hover:bg-yellow-400 transition-colors">
-              <Download className="w-5 h-5" /> Export Data
-            </button>
-            <button onClick={handleLogout} className="flex items-center gap-2 bg-red-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-red-700 transition-colors">
-              <LogOut className="w-5 h-5" /> Logout
+          <div className="mt-4 sm:mt-0 flex gap-4">
+            <div className="relative">
+              <button 
+                onClick={() => setExportMenuOpen(!exportMenuOpen)}
+                disabled={isExporting}
+                className="flex items-center gap-2 bg-garba-green hover:bg-green-600 px-4 py-2 rounded-lg font-bold transition-colors disabled:opacity-70"
+              >
+                {isExporting ? <span className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></span> : <Download className="w-5 h-5" />}
+                {isExporting ? 'Exporting...' : 'Export Data'}
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {exportMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-xl border border-garba-gold/30 rounded-lg shadow-xl overflow-hidden z-50">
+                  <button onClick={() => handleExport('all')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-white font-semibold border-b border-garba-gold/10">
+                    Export All Entries
+                  </button>
+                  <button onClick={() => handleExport('filtered')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-white font-semibold">
+                    Export Filtered Only
+                  </button>
+                </div>
+              )}
+            </div>
+            <button onClick={handleLogout} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-bold transition-colors">
+              <LogOut className="w-5 h-5" />
+              Logout
             </button>
           </div>
         </header>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Total Entries" value={totalEntries.toString()} icon={<Ticket />} color="garba-gold" />
-          <StatCard title="Stag Entries" value={stagCount.toString()} icon={<User />} color="garba-green" />
-          <StatCard title="Duo Entries" value={duoCount.toString()} icon={<Users />} color="blue-400" />
-          <StatCard title="Peak Time" value="Live" icon={<Calendar />} color="purple-400" />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+          <StatCard 
+            title="Total Entries" 
+            value={totalEntries.toString()} 
+            icon={<Users />} 
+            color="garba-gold" 
+            active={filterType === 'all'}
+            onClick={() => setFilterType('all')}
+          />
+          <StatCard 
+            title="Stag Passes" 
+            value={stagCount.toString()} 
+            icon={<User />} 
+            color="garba-green" 
+            active={filterType === 'stag'}
+            onClick={() => setFilterType('stag')}
+          />
+          <StatCard 
+            title="Duo Passes" 
+            value={duoCount.toString()} 
+            icon={<Ticket />} 
+            color="blue-400" 
+            active={filterType === 'duo'}
+            onClick={() => setFilterType('duo')}
+          />
+          <StatCard 
+            title="Current View" 
+            value={filteredData.length.toString()} 
+            icon={<Calendar />} 
+            color="purple-400" 
+          />
         </div>
 
         {/* Tabs */}
@@ -139,16 +266,26 @@ export default function AdminDashboard() {
         {activeTab === 'entries' ? (
           <div className="ornate-card overflow-hidden flex flex-col animate-fade-in-down">
             <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Recent Entries</h2>
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-garba-light/50" />
-                <input 
-                  type="text" 
-                  placeholder="Search pass or name..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-black/30 border border-garba-gold/30 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:border-garba-gold transition-colors"
-                />
+              <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Entries</h2>
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <select 
+                  value={filterDate} 
+                  onChange={(e) => setFilterDate(e.target.value)}
+                  className="bg-black/40 border border-garba-gold/30 rounded-lg py-2 px-4 text-white font-semibold focus:outline-none focus:border-garba-gold transition-colors"
+                >
+                  <option value="all">All Dates</option>
+                  {uniqueDates.map(d => <option key={d as string} value={d as string}>{d as string}</option>)}
+                </select>
+                <div className="relative w-full sm:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-garba-light/50" />
+                  <input 
+                    type="text" 
+                    placeholder="Search pass or name..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-black/40 border border-garba-gold/30 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:border-garba-gold transition-colors"
+                  />
+                </div>
               </div>
             </div>
 
@@ -182,14 +319,14 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-4 opacity-80">{row.entry_date}</td>
-                      <td className="px-6 py-4 opacity-80">{new Date(row.created_at).toLocaleTimeString('en-IN')}</td>
+                      <td className="px-6 py-4 opacity-80">{new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               {!loading && filteredData.length === 0 && (
                 <div className="p-8 text-center text-garba-light/50">
-                  No entries found matching your search.
+                  No entries found matching your filters.
                 </div>
               )}
             </div>
@@ -241,8 +378,7 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, color }: { title: string, value: string, icon: React.ReactNode, color: string }) {
-  // Simple mapping for Tailwind dynamic classes based on prop
+function StatCard({ title, value, icon, color, active, onClick }: { title: string, value: string, icon: React.ReactNode, color: string, active?: boolean, onClick?: () => void }) {
   const iconColor = color === 'garba-gold' ? 'text-garba-gold' : 
                     color === 'garba-green' ? 'text-garba-green' : 
                     color === 'blue-400' ? 'text-blue-400' : 'text-purple-400';
@@ -252,7 +388,10 @@ function StatCard({ title, value, icon, color }: { title: string, value: string,
                   color === 'blue-400' ? 'bg-blue-400/10' : 'bg-purple-400/10';
 
   return (
-    <div className="ornate-card p-6 flex items-center gap-4 hover:border-garba-gold/80 transition-colors">
+    <div 
+      onClick={onClick} 
+      className={`ornate-card p-6 flex items-center gap-4 transition-all ${onClick ? 'cursor-pointer hover:border-garba-gold' : ''} ${active ? 'border-garba-gold bg-garba-gold/20 scale-[1.02]' : 'border-garba-gold/30'}`}
+    >
       <div className={`p-4 rounded-xl ${bgColor} ${iconColor}`}>
         {icon}
       </div>
