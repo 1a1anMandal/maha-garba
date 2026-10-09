@@ -95,17 +95,33 @@ export default function AdminDashboard() {
   
   const uniqueDates = Array.from(new Set(entries.map(e => e.entry_date))).sort((a, b) => (b as string).localeCompare(a as string));
 
-  const handleExport = async (exportType: 'all' | 'filtered') => {
+  const handleExport = async (exportType: 'all' | 'duo' | 'stag' | 'filtered') => {
     setIsExporting(true);
     setExportMenuOpen(false);
     try {
-      const dataToExport = exportType === 'all' ? entries : filteredData;
+      let dataToExport = entries;
+      
+      if (exportType === 'duo') {
+        dataToExport = entries.filter(e => e.entry_type === 'duo');
+      } else if (exportType === 'stag') {
+        dataToExport = entries.filter(e => e.entry_type === 'stag');
+      } else if (exportType === 'filtered') {
+        dataToExport = filteredData;
+      }
+      
+      // Sort by Pass Number
+      dataToExport = [...dataToExport].sort((a, b) => (a.pass_serial || "").localeCompare(b.pass_serial || ""));
       
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet('Attendance');
 
       // Title Row
-      const titleRow = sheet.addRow([`GARBA WORKSHOP ATTENDANCE — ${filterType === 'all' ? 'ALL' : filterType.toUpperCase()} PASS — ${filterDate === 'all' ? 'ALL DATES' : filterDate}`]);
+      const typeLabel = exportType === 'all' || exportType === 'filtered' 
+                        ? (filterType === 'all' ? 'ALL' : filterType.toUpperCase()) 
+                        : exportType.toUpperCase();
+      const dateLabel = exportType === 'filtered' && filterDate !== 'all' ? filterDate : 'ALL DATES';
+      
+      const titleRow = sheet.addRow([`GARBA WORKSHOP ATTENDANCE — ${typeLabel} PASS — ${dateLabel}`]);
       titleRow.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
       titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
       titleRow.height = 30;
@@ -153,7 +169,13 @@ export default function AdminDashboard() {
 
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      saveAs(blob, `Maha_Garba_${exportType === 'all' ? 'All' : 'Filtered'}_Entries.xlsx`);
+      
+      let fileName = 'Maha_Garba_Entries';
+      if (exportType === 'duo') fileName = 'Maha_Garba_DUO_Entries';
+      else if (exportType === 'stag') fileName = 'Maha_Garba_STAG_Entries';
+      else if (exportType === 'filtered') fileName = 'Maha_Garba_Filtered_Entries';
+      
+      saveAs(blob, `${fileName}.xlsx`);
       
     } catch (e) {
       console.error(e);
@@ -196,11 +218,17 @@ export default function AdminDashboard() {
               </button>
               {exportMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-xl border border-garba-gold/30 rounded-lg shadow-xl overflow-hidden z-50">
-                  <button onClick={() => handleExport('all')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-white font-semibold border-b border-garba-gold/10">
+                  <button onClick={() => handleExport('all')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-white font-semibold border-b border-garba-gold/10 transition-colors">
                     Export All Entries
                   </button>
-                  <button onClick={() => handleExport('filtered')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-white font-semibold">
-                    Export Filtered Only
+                  <button onClick={() => handleExport('duo')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-blue-300 font-semibold border-b border-garba-gold/10 transition-colors">
+                    Export Duo Only
+                  </button>
+                  <button onClick={() => handleExport('stag')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-garba-green font-semibold border-b border-garba-gold/10 transition-colors">
+                    Export Stag Only
+                  </button>
+                  <button onClick={() => handleExport('filtered')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-garba-gold font-semibold transition-colors">
+                    Export Filtered View
                   </button>
                 </div>
               )}
