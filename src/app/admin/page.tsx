@@ -297,7 +297,20 @@ export default function AdminDashboard() {
         {activeTab === 'entries' ? (
           <div className="ornate-card overflow-hidden flex flex-col animate-fade-in-down">
             <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Entries</h2>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Entries</h2>
+                <div className="flex gap-3 text-xs font-bold uppercase tracking-wider">
+                  <span className="text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">
+                    Total: {entries.filter(d => filterDate === 'all' || d.entry_date === filterDate).length}
+                  </span>
+                  <span className="text-garba-green bg-garba-green/10 px-2 py-0.5 rounded">
+                    Stag: {entries.filter(d => (filterDate === 'all' || d.entry_date === filterDate) && d.entry_type === 'stag').length}
+                  </span>
+                  <span className="text-blue-400 bg-blue-400/10 px-2 py-0.5 rounded">
+                    Duo: {entries.filter(d => (filterDate === 'all' || d.entry_date === filterDate) && d.entry_type === 'duo').length}
+                  </span>
+                </div>
+              </div>
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                 <select 
                   value={filterDate} 
