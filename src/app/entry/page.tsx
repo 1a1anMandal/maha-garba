@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, AlertCircle, User, Users, Calendar, Ticket, LogOut } from "lucide-react";
+import { CheckCircle2, AlertCircle, User, Users, Calendar, Ticket, LogOut, Loader2 } from "lucide-react";
 import { DandiyaIcon } from "@/components/DandiyaIcon";
 import preRegistered from "@/lib/preRegistered.json";
 
@@ -16,6 +16,8 @@ export default function GateEntry() {
   const [name2, setName2] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "duplicate" | "error">("idle");
   const [loading, setLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  
   const [date] = useState(() => {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -23,17 +25,19 @@ export default function GateEntry() {
     const dd = String(today.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
   });
+  
   const [errorMsg, setErrorMsg] = useState("");
   const [duplicateNameWarning, setDuplicateNameWarning] = useState<{pass: string, type: string} | null>(null);
   const [showTypePopup, setShowTypePopup] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pendingMatches, setPendingMatches] = useState<any[]>([]);
 
   const passInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
         router.push('/');
       }
     };
@@ -41,87 +45,79 @@ export default function GateEntry() {
     passInputRef.current?.focus();
   }, [router]);
 
-  // Autofill logic
+  // Autofill & Instant Check logic
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (passSerial.length >= 3 && !name1 && !showTypePopup) {
+      if (passSerial.length >= 3 && !name1 && !showTypePopup && status === 'idle' && !isChecking) {
         const matches = preRegistered.filter(p => p.pass_serial === passSerial || passSerial.endsWith(p.pass_serial));
-        if (matches.length > 0) {
+        if (matches.length > 1) {
           setPendingMatches(matches);
           setShowTypePopup(true);
+        } else if (matches.length === 1) {
+          checkAndAutofill(matches[0]);
         }
       }
-    }, 600);
+    }, 500);
     return () => clearTimeout(timer);
-  }, [passSerial, name1, showTypePopup]);
+  }, [passSerial, name1, showTypePopup, status, isChecking]);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const checkAndAutofill = async (match: any) => {
+    setIsChecking(true);
+    const exactPassSerial = match.pass_serial;
+    const type = match.entry_type;
+
+    // Instantly check DB for today's entry
+    const { data } = await supabase
+      .from('entries')
+      .select('id')
+      .eq('pass_serial', `${exactPassSerial}_${type}_${date}`)
+      .maybeSingle();
+
+    setIsChecking(false);
+
+    // Autofill fields
+    setPassSerial(exactPassSerial);
+    setEntryType(type as "stag" | "duo");
+    setName1(match.name_1);
+    if (match.name_2) setName2(match.name_2);
+    else setName2("");
+
+    if (data) {
+      // Already marked present today!
+      setStatus("duplicate");
+    }
+  };
 
   const handleSelectType = (selectedType: "stag" | "duo") => {
     const match = pendingMatches.find(m => m.entry_type === selectedType);
-    if (match) {
-      setName1(match.name_1);
-      if (match.name_2) setName2(match.name_2);
-      else setName2("");
-    } else {
-      setName1("");
-      setName2("");
-    }
-    setEntryType(selectedType);
     setShowTypePopup(false);
+    if (match) {
+      checkAndAutofill(match);
+    }
   };
 
+  const resetForm = () => {
+    setPassSerial("");
+    setName1("");
+    setName2("");
+    setStatus("idle");
+    setEntryType("stag");
+    setErrorMsg("");
+    setDuplicateNameWarning(null);
+    setShowTypePopup(false);
+    setPendingMatches([]);
+    setTimeout(() => {
+      passInputRef.current?.focus();
+    }, 100);
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
   };
 
-  const handleSubmit = async (e: React.FormEvent, bypassNameCheck = false) => {
-    e.preventDefault();
-    if (!passSerial || !name1) return;
-
-    if (!name1.trim().includes(' ')) {
-      setStatus("error");
-      setErrorMsg("Participant 1 must have a Full Name (First and Last Name).");
-      return;
-    }
-    if (name2 && !name2.trim().includes(' ')) {
-      setStatus("error");
-      setErrorMsg("Participant 2 must have a Full Name (First and Last Name).");
-      return;
-    }
-
-    if (!bypassNameCheck) {
-      const orQuery = `name_1.ilike."${name1.trim()}",name_2.ilike."${name1.trim()}"` + (name2 ? `,name_1.ilike."${name2.trim()}",name_2.ilike."${name2.trim()}"` : "");
-      const { data: matches } = await supabase
-        .from('entries')
-        .select('pass_serial, entry_type')
-        .or(orQuery)
-        .limit(10); // Fetch a few to find one that is truly a different pass
-
-      let duplicateInfo = null;
-      if (matches) {
-        const diffPass = matches.find(m => m.pass_serial.split('_')[0] !== passSerial);
-        if (diffPass) duplicateInfo = diffPass;
-      }
-      
-      if (!duplicateInfo) {
-        const dupLocal = preRegistered.find(p => 
-          !(p.pass_serial === passSerial && p.entry_type === entryType) && 
-          (p.name_1.toLowerCase() === name1.trim().toLowerCase() || 
-           (p.name_2 && p.name_2.toLowerCase() === name1.trim().toLowerCase()) ||
-           (name2 && p.name_1.toLowerCase() === name2.trim().toLowerCase()) ||
-           (name2 && p.name_2 && p.name_2.toLowerCase() === name2.trim().toLowerCase())
-          )
-        );
-        if (dupLocal) duplicateInfo = dupLocal;
-      }
-
-      if (duplicateInfo) {
-        setDuplicateNameWarning({ pass: duplicateInfo.pass_serial, type: duplicateInfo.entry_type });
-        return;
-      }
-    }
-
+  const submitEntry = async (bypassNameCheck = false) => {
     setLoading(true);
     setStatus("idle");
     setErrorMsg("");
@@ -149,178 +145,213 @@ export default function GateEntry() {
       }
     } else {
       setStatus("success");
-      setPassSerial("");
-      setName1("");
-      setName2("");
-      setEntryType("stag");
-      passInputRef.current?.focus();
-      setTimeout(() => setStatus("idle"), 2500);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passSerial || !name1) return;
+
+    if (!name1.trim().includes(' ')) {
+      setStatus("error");
+      setErrorMsg("Participant 1 must have a Full Name (First and Last Name).");
+      return;
+    }
+    if (name2 && !name2.trim().includes(' ')) {
+      setStatus("error");
+      setErrorMsg("Participant 2 must have a Full Name (First and Last Name).");
+      return;
+    }
+
+    const orQuery = `name_1.ilike."${name1.trim()}",name_2.ilike."${name1.trim()}"` + (name2 ? `,name_1.ilike."${name2.trim()}",name_2.ilike."${name2.trim()}"` : "");
+    const { data: matches } = await supabase
+      .from('entries')
+      .select('pass_serial, entry_type')
+      .or(orQuery)
+      .limit(10);
+
+    let duplicateInfo = null;
+    if (matches) {
+      const diffPass = matches.find(m => m.pass_serial.split('_')[0] !== passSerial);
+      if (diffPass) duplicateInfo = diffPass;
+    }
+    
+    if (!duplicateInfo) {
+      const dupLocal = preRegistered.find(p => 
+        !(p.pass_serial === passSerial && p.entry_type === entryType) && 
+        (p.name_1.toLowerCase() === name1.trim().toLowerCase() || 
+         (p.name_2 && p.name_2.toLowerCase() === name1.trim().toLowerCase()) ||
+         (name2 && p.name_1.toLowerCase() === name2.trim().toLowerCase()) ||
+         (name2 && p.name_2 && p.name_2.toLowerCase() === name2.trim().toLowerCase())
+        )
+      );
+      if (dupLocal) duplicateInfo = dupLocal;
+    }
+
+    if (duplicateInfo) {
+      setDuplicateNameWarning({ pass: duplicateInfo.pass_serial, type: duplicateInfo.entry_type });
+      return;
+    }
+
+    submitEntry(false);
   };
 
   return (
     <>
-      <div className="bg-app"></div>
-      <div className="bg-overlay"></div>
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
+    <div className="min-h-screen bg-app flex flex-col items-center pt-8 pb-12 px-4 relative overflow-hidden font-sans">
+      <div className="absolute inset-0 bg-black/40"></div>
       
-      {/* Decorative Header */}
-      <div className="text-center mb-8 animate-fade-in flex flex-col items-center relative w-full max-w-md">
-        <button onClick={handleLogout} className="absolute right-0 top-0 text-garba-light/60 hover:text-white transition-colors" title="Logout">
-          <LogOut className="w-6 h-6" />
-        </button>
-        <DandiyaIcon className="w-16 h-16 mb-2" />
-        <h1 className="text-4xl sm:text-6xl font-black text-garba-gold text-glow uppercase tracking-wider font-[family-name:var(--font-rozha)]">
-          Maha Garba
+      {/* Header */}
+      <div className="w-full max-w-lg flex justify-between items-center mb-8 relative z-10 px-2">
+        <h1 className="text-3xl font-rozha text-garba-gold drop-shadow-lg tracking-wide flex flex-col leading-tight">
+          <span>MAHA GARBA</span>
+          <span className="text-sm font-sans tracking-widest text-garba-light/80 uppercase">Gate Entry</span>
         </h1>
-        <div className="subtitle-lines w-full mt-2">
-          <p className="text-garba-light text-sm sm:text-base tracking-[0.3em] font-semibold uppercase whitespace-nowrap px-4">
-            Entry Management
-          </p>
-        </div>
+        <button 
+          onClick={handleLogout}
+          className="bg-black/50 hover:bg-black/80 text-garba-gold border border-garba-gold/30 p-3 rounded-xl transition-all shadow-lg active:scale-95"
+          title="Logout"
+        >
+          <LogOut className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* Main Entry Card */}
-      <div className={`w-full max-w-md ornate-card transition-all duration-500 ${
-          status === "success" ? "border-garba-green shadow-[0_0_40px_rgba(21,109,53,0.8)]" : 
-          status === "duplicate" ? "border-red-500 shadow-[0_0_40px_rgba(239,68,68,0.8)]" : 
-          ""
-        }`}>
+      <div className="w-full max-w-lg ornate-card p-1 sm:p-2 relative z-10 mx-auto mt-2">
+        <div className="border-dots opacity-50 mt-2 mx-4"></div>
         
-        {/* Top border dots */}
-        <div className="border-dots opacity-50 mt-4 mx-4"></div>
-
-        <div className="p-6 sm:p-8 pt-4">
+        <div className="p-6 sm:p-8 relative">
           
-          {/* Status Banners */}
-          {/* Popup Notifications */}
-      {status === "success" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
-          <div className="bg-garba-green text-white p-8 rounded-2xl flex flex-col items-center gap-4 animate-bounce-in shadow-2xl max-w-sm w-full mx-4 border-2 border-green-400">
-            <CheckCircle2 className="w-16 h-16" />
-            <div className="text-center">
-              <p className="font-black text-2xl uppercase tracking-wider">Entry Successful!</p>
-              <p className="text-lg opacity-90 mt-2">Ready for next pass.</p>
-            </div>
-          </div>
-        </div>
-      )}
+          <DandiyaIcon className="w-16 h-16 mx-auto mb-6 drop-shadow-[0_0_15px_rgba(245,183,0,0.5)]" />
 
-      {status === "duplicate" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
-          <div className="bg-red-600 text-white p-8 rounded-2xl flex flex-col items-center gap-4 animate-shake shadow-2xl max-w-sm w-full mx-4 border-2 border-red-400">
-            <AlertCircle className="w-16 h-16 shrink-0" />
-            <div className="text-center">
-              <p className="font-black text-2xl uppercase tracking-wider">Pass Already Used!</p>
-              <p className="text-lg opacity-90 mt-2">This pass was already scanned today.</p>
-              <button 
-                onClick={() => {
-                  setStatus("idle");
-                  setPassSerial("");
-                  setName1("");
-                  setName2("");
-                  passInputRef.current?.focus();
-                }}
-                className="mt-6 w-full bg-white text-red-600 px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-lg active:scale-95"
-              >
-                Clear & Scan Next
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          {/* Glassmorphism Modals */}
 
-      {status === "error" && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
-          <div className="bg-red-600 text-white p-8 rounded-2xl flex flex-col items-center gap-4 animate-shake shadow-2xl max-w-sm w-full mx-4 border-2 border-red-400">
-            <AlertCircle className="w-16 h-16 shrink-0" />
-            <div className="text-center">
-              <p className="font-black text-2xl uppercase tracking-wider">System Error!</p>
-              <p className="text-lg opacity-90 mt-2">{errorMsg}</p>
-              <button 
-                onClick={() => setStatus("idle")}
-                className="mt-6 w-full bg-white text-red-600 px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-lg active:scale-95"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Duplicate Name Warning Popup */}
-      {duplicateNameWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
-          <div className="bg-garba-darkred text-white p-8 rounded-2xl flex flex-col items-center gap-4 shadow-2xl max-w-sm w-full mx-4 border-2 border-yellow-500">
-            <AlertCircle className="w-16 h-16 shrink-0 text-yellow-500" />
-            <div className="text-center">
-              <p className="font-black text-2xl uppercase tracking-wider text-yellow-500">Name Exists!</p>
-              <p className="text-lg opacity-90 mt-2">Name already exists under a different pass.</p>
-              <p className="font-bold text-xl text-white mt-2">Pass: {duplicateNameWarning.type.toUpperCase()} {duplicateNameWarning.pass}</p>
-              <div className="flex flex-col gap-3 mt-6">
+          {/* Success Popup */}
+          {status === "success" && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+              <div className="bg-garba-green/20 backdrop-blur-xl border border-garba-green/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(34,197,94,0.3)] transform transition-all animate-bounce-in">
+                <CheckCircle2 className="w-20 h-20 text-green-400 mx-auto mb-6 drop-shadow-md" />
+                <h2 className="text-3xl font-black text-green-400 mb-2 uppercase tracking-widest drop-shadow-md">Entry Granted</h2>
+                <p className="text-green-100 text-lg mb-8 font-medium">Welcome to Maha Garba!</p>
                 <button 
-                  onClick={() => setDuplicateNameWarning(null)}
-                  className="w-full bg-white text-garba-darkred px-6 py-3 rounded-xl font-bold text-lg hover:bg-gray-100 transition shadow-lg active:scale-95"
+                  onClick={resetForm}
+                  className="w-full bg-green-500 hover:bg-green-400 text-black font-bold py-3 rounded-xl shadow-lg transition-colors text-lg"
                 >
-                  Cancel
-                </button>
-                <button 
-                  onClick={(e) => {
-                    setDuplicateNameWarning(null);
-                    handleSubmit(e as any, true);
-                  }}
-                  className="w-full bg-transparent border border-white/30 text-white/70 px-6 py-3 rounded-xl font-bold hover:bg-white/10 transition active:scale-95"
-                >
-                  Proceed Anyway
+                  Next Pass
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* Select Pass Type Popup */}
-      {showTypePopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-down">
-          <div className="bg-garba-darkred text-white p-8 rounded-2xl flex flex-col items-center gap-6 shadow-2xl max-w-md w-full mx-4 border-2 border-garba-gold">
-            <div className="text-center">
-              <h3 className="font-black text-2xl text-garba-gold uppercase tracking-wider mb-2">Select Pass Type</h3>
-              <p className="text-garba-light/80">Please confirm if this is a Stag or Duo pass before proceeding.</p>
+          {/* Duplicate Popup */}
+          {status === "duplicate" && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+              <div className="bg-orange-500/20 backdrop-blur-xl border border-orange-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(249,115,22,0.3)] transform transition-all animate-bounce-in">
+                <AlertCircle className="w-20 h-20 text-orange-400 mx-auto mb-6 drop-shadow-md" />
+                <h2 className="text-3xl font-black text-orange-400 mb-2 uppercase tracking-widest drop-shadow-md">Already Present</h2>
+                <p className="text-orange-100 text-lg mb-8 font-medium">This pass has already been marked for today.</p>
+                <button 
+                  onClick={resetForm}
+                  className="w-full bg-orange-500 hover:bg-orange-400 text-black font-bold py-3 rounded-xl shadow-lg transition-colors text-lg"
+                >
+                  Scan Another
+                </button>
+              </div>
             </div>
-            
-            <div className="grid grid-cols-2 gap-4 w-full">
-              <button
-                type="button"
-                onClick={() => handleSelectType("stag")}
-                className="py-4 rounded-xl flex flex-col items-center justify-center gap-3 font-bold border-2 bg-black/40 text-white/90 border-garba-gold/30 hover:border-garba-gold hover:bg-garba-gold/20 transition-all active:scale-95"
-              >
-                <User className="w-8 h-8 text-garba-gold" /> 
-                <span className="text-lg">STAG (1)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSelectType("duo")}
-                className="py-4 rounded-xl flex flex-col items-center justify-center gap-3 font-bold border-2 bg-black/40 text-white/90 border-garba-gold/30 hover:border-garba-gold hover:bg-garba-gold/20 transition-all active:scale-95"
-              >
-                <Users className="w-8 h-8 text-garba-gold" /> 
-                <span className="text-lg">DUO (2)</span>
-              </button>
+          )}
+
+          {/* Error Popup */}
+          {status === "error" && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+              <div className="bg-red-500/20 backdrop-blur-xl border border-red-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(239,68,68,0.3)] transform transition-all animate-bounce-in">
+                <AlertCircle className="w-20 h-20 text-red-400 mx-auto mb-6 drop-shadow-md" />
+                <h2 className="text-3xl font-black text-red-400 mb-2 uppercase tracking-widest drop-shadow-md">System Error</h2>
+                <p className="text-red-100 text-lg mb-8 font-medium">{errorMsg}</p>
+                <button 
+                  onClick={() => setStatus("idle")}
+                  className="w-full bg-red-500 hover:bg-red-400 text-white font-bold py-3 rounded-xl shadow-lg transition-colors text-lg"
+                >
+                  Try Again
+                </button>
+              </div>
             </div>
-            
-            <button 
-              onClick={() => setShowTypePopup(false)}
-              className="mt-2 text-sm text-garba-light/60 hover:text-white transition-colors underline underline-offset-4"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+          )}
+
+          {/* Duplicate Name Warning Popup */}
+          {duplicateNameWarning && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+              <div className="bg-yellow-500/20 backdrop-blur-xl border border-yellow-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(234,179,8,0.3)] transform transition-all animate-bounce-in">
+                <AlertCircle className="w-20 h-20 text-yellow-400 mx-auto mb-6 drop-shadow-md" />
+                <h2 className="text-2xl font-black text-yellow-400 mb-2 uppercase tracking-wide drop-shadow-md">Name Exists!</h2>
+                <p className="text-yellow-100 text-[15px] mb-6 font-medium leading-relaxed">
+                  This name is already registered under:<br/>
+                  <strong className="text-white text-lg block mt-2">{duplicateNameWarning.type.toUpperCase()} - {duplicateNameWarning.pass.split('_')[0]}</strong>
+                </p>
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => setDuplicateNameWarning(null)}
+                    className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-xl transition-colors border border-white/20"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setDuplicateNameWarning(null);
+                      submitEntry(true);
+                    }}
+                    className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-xl shadow-lg transition-colors"
+                  >
+                    Proceed Anyway
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Type Choice Popup */}
+          {showTypePopup && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 flex flex-col items-center gap-6 shadow-[0_8px_32px_rgba(255,255,255,0.1)] max-w-md w-full mx-4 transform transition-all animate-bounce-in">
+                <div className="text-center">
+                  <h3 className="font-black text-2xl text-garba-gold uppercase tracking-wider mb-2 drop-shadow-md">Select Pass Type</h3>
+                  <p className="text-garba-light/90 font-medium">This pass number exists in multiple categories. Please choose.</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 w-full">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectType("stag")}
+                    className="py-4 rounded-xl flex flex-col items-center justify-center gap-3 font-bold border border-white/20 bg-white/5 text-white hover:bg-garba-gold/20 hover:border-garba-gold/50 hover:text-garba-gold transition-all active:scale-95"
+                  >
+                    <User className="w-8 h-8 drop-shadow-md" /> 
+                    <span className="text-lg">STAG (1)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSelectType("duo")}
+                    className="py-4 rounded-xl flex flex-col items-center justify-center gap-3 font-bold border border-white/20 bg-white/5 text-white hover:bg-garba-gold/20 hover:border-garba-gold/50 hover:text-garba-gold transition-all active:scale-95"
+                  >
+                    <Users className="w-8 h-8 drop-shadow-md" /> 
+                    <span className="text-lg">DUO (2)</span>
+                  </button>
+                </div>
+                
+                <button 
+                  onClick={() => setShowTypePopup(false)}
+                  className="mt-2 text-sm text-garba-light/60 hover:text-white transition-colors underline underline-offset-4"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {/* Pass Serial */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-garba-gold font-bold text-sm tracking-wide uppercase">Pass Serial Number</label>
+              <label className="text-garba-gold font-bold text-sm tracking-wide uppercase flex justify-between items-center">
+                <span>Pass Serial Number</span>
+                {isChecking && <Loader2 className="w-4 h-4 text-garba-gold animate-spin" />}
+              </label>
               <div className="relative">
                 <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-garba-gold/70" />
                 <input 
@@ -328,7 +359,7 @@ export default function GateEntry() {
                   type="text" 
                   value={passSerial}
                   onChange={(e) => setPassSerial(e.target.value)}
-                  placeholder="e.g. MG-2024-001"
+                  placeholder="e.g. 005"
                   className="w-full bg-garba-darkred border-2 border-garba-gold/30 rounded-xl py-3 pl-10 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:border-garba-gold font-mono text-lg transition-colors"
                   autoComplete="off"
                 />
@@ -344,7 +375,7 @@ export default function GateEntry() {
                   onClick={() => setEntryType("stag")}
                   className={`py-3 rounded-xl flex items-center justify-center gap-2 font-bold border-2 transition-colors ${
                     entryType === "stag" 
-                      ? "bg-garba-gold text-garba-maroon border-garba-gold" 
+                      ? "bg-garba-gold text-garba-maroon border-garba-gold shadow-[0_0_15px_rgba(245,183,0,0.3)]" 
                       : "bg-garba-darkred text-white/70 border-transparent hover:border-garba-gold/30"
                   }`}
                 >
@@ -355,7 +386,7 @@ export default function GateEntry() {
                   onClick={() => setEntryType("duo")}
                   className={`py-3 rounded-xl flex items-center justify-center gap-2 font-bold border-2 transition-colors ${
                     entryType === "duo" 
-                      ? "bg-garba-gold text-garba-maroon border-garba-gold" 
+                      ? "bg-garba-gold text-garba-maroon border-garba-gold shadow-[0_0_15px_rgba(245,183,0,0.3)]" 
                       : "bg-garba-darkred text-white/70 border-transparent hover:border-garba-gold/30"
                   }`}
                 >
@@ -386,7 +417,7 @@ export default function GateEntry() {
                     type="text" 
                     value={name2}
                     onChange={(e) => setName2(e.target.value)}
-                    placeholder="Enter second name"
+                    placeholder="Enter second name (optional)"
                     className="w-full bg-garba-darkred border-2 border-garba-gold/30 rounded-xl py-3 px-4 text-white placeholder:text-white/40 focus:outline-none focus:border-garba-gold transition-colors"
                   />
                 </div>
@@ -406,7 +437,7 @@ export default function GateEntry() {
               className="mt-2 w-full bg-gradient-to-r from-garba-gold to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-garba-maroon font-black text-xl py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {loading ? (
-                <div className="w-6 h-6 border-4 border-garba-maroon border-t-transparent rounded-full animate-spin"></div>
+                <Loader2 className="w-6 h-6 text-garba-maroon animate-spin" />
               ) : (
                 "VALIDATE & ENTER"
               )}
@@ -424,20 +455,18 @@ export default function GateEntry() {
           0% { opacity: 0; transform: translateY(-10px); }
           100% { opacity: 1; transform: translateY(0); }
         }
+        @keyframes fade-in {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
         @keyframes bounce-in {
           0% { transform: scale(0.9); opacity: 0; }
           50% { transform: scale(1.05); opacity: 1; }
           100% { transform: scale(1); opacity: 1; }
         }
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          50% { transform: translateX(5px); }
-          75% { transform: translateX(-5px); }
-        }
+        .animate-fade-in { animation: fade-in 0.2s ease-out forwards; }
         .animate-fade-in-down { animation: fade-in-down 0.3s ease-out forwards; }
         .animate-bounce-in { animation: bounce-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .animate-shake { animation: shake 0.4s ease-in-out; }
       `}} />
     </div>
     </>
