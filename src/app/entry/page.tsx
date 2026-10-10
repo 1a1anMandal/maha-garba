@@ -45,11 +45,44 @@ export default function GateEntry() {
     passInputRef.current?.focus();
   }, [router]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const checkAndAutofill = async (match: any) => {
+    setIsChecking(true);
+    const exactPassSerial = match.pass_serial;
+    const type = match.entry_type;
+
+    try {
+      // Instantly check DB for today's entry
+      const { data } = await supabase
+        .from('entries')
+        .select('id')
+        .eq('pass_serial', `${exactPassSerial}_${type}_${date}`)
+        .maybeSingle();
+
+      setIsChecking(false);
+
+      // Autofill fields
+      setPassSerial(exactPassSerial);
+      setEntryType(type as "stag" | "duo");
+      setName1(match.name_1 || "");
+      if (match.name_2) setName2(match.name_2);
+      else setName2("");
+
+      if (data) {
+        // Already marked present today!
+        setStatus("duplicate");
+      }
+    } catch (err) {
+      console.error("Autofill check failed", err);
+      setIsChecking(false);
+    }
+  };
+
   // Autofill & Instant Check logic
   useEffect(() => {
     const timer = setTimeout(() => {
       if (passSerial.length >= 3 && !name1 && !showTypePopup && status === 'idle' && !isChecking) {
-        const matches = preRegistered.filter(p => p.pass_serial === passSerial || passSerial.endsWith(p.pass_serial));
+        const matches = preRegistered.filter(p => p.pass_serial === passSerial || passSerial.endsWith(String(p.pass_serial)));
         if (matches.length > 1) {
           setPendingMatches(matches);
           setShowTypePopup(true);
@@ -60,34 +93,6 @@ export default function GateEntry() {
     }, 500);
     return () => clearTimeout(timer);
   }, [passSerial, name1, showTypePopup, status, isChecking]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const checkAndAutofill = async (match: any) => {
-    setIsChecking(true);
-    const exactPassSerial = match.pass_serial;
-    const type = match.entry_type;
-
-    // Instantly check DB for today's entry
-    const { data } = await supabase
-      .from('entries')
-      .select('id')
-      .eq('pass_serial', `${exactPassSerial}_${type}_${date}`)
-      .maybeSingle();
-
-    setIsChecking(false);
-
-    // Autofill fields
-    setPassSerial(exactPassSerial);
-    setEntryType(type as "stag" | "duo");
-    setName1(match.name_1);
-    if (match.name_2) setName2(match.name_2);
-    else setName2("");
-
-    if (data) {
-      // Already marked present today!
-      setStatus("duplicate");
-    }
-  };
 
   const handleSelectType = (selectedType: "stag" | "duo") => {
     const match = pendingMatches.find(m => m.entry_type === selectedType);
@@ -122,29 +127,35 @@ export default function GateEntry() {
     setStatus("idle");
     setErrorMsg("");
 
-    const { error } = await supabase
-      .from('entries')
-      .insert([
-        {
-          pass_serial: `${passSerial}_${entryType}_${date}`,
-          name_1: name1,
-          name_2: entryType === "duo" ? name2 : null,
-          entry_type: entryType,
-          entry_date: date,
+    try {
+      const { error } = await supabase
+        .from('entries')
+        .insert([
+          {
+            pass_serial: `${passSerial}_${entryType}_${date}`,
+            name_1: name1,
+            name_2: entryType === "duo" ? name2 : null,
+            entry_type: entryType,
+            entry_date: date,
+          }
+        ]);
+
+      if (error) {
+        if (error.code === '23505') { // Postgres Unique Violation
+          setStatus("duplicate");
+        } else {
+          setStatus("error");
+          setErrorMsg(error.message);
         }
-      ]);
-
-    setLoading(false);
-
-    if (error) {
-      if (error.code === '23505') { // Postgres Unique Violation
-        setStatus("duplicate");
       } else {
-        setStatus("error");
-        setErrorMsg(error.message);
+        setStatus("success");
       }
-    } else {
-      setStatus("success");
+    } catch (err: any) {
+      console.error(err);
+      setStatus("error");
+      setErrorMsg(err.message || "An unexpected error occurred during submission.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -163,37 +174,50 @@ export default function GateEntry() {
       return;
     }
 
-    const orQuery = `name_1.ilike."${name1.trim()}",name_2.ilike."${name1.trim()}"` + (name2 ? `,name_1.ilike."${name2.trim()}",name_2.ilike."${name2.trim()}"` : "");
-    const { data: matches } = await supabase
-      .from('entries')
-      .select('pass_serial, entry_type')
-      .or(orQuery)
-      .limit(10);
+    try {
+      const orQuery = `name_1.ilike."${name1.trim()}",name_2.ilike."${name1.trim()}"` + (name2 ? `,name_1.ilike."${name2.trim()}",name_2.ilike."${name2.trim()}"` : "");
+      const { data: matches, error: matchError } = await supabase
+        .from('entries')
+        .select('pass_serial, entry_type')
+        .or(orQuery)
+        .limit(10);
 
-    let duplicateInfo = null;
-    if (matches) {
-      const diffPass = matches.find(m => m.pass_serial.split('_')[0] !== passSerial);
-      if (diffPass) duplicateInfo = diffPass;
-    }
-    
-    if (!duplicateInfo) {
-      const dupLocal = preRegistered.find(p => 
-        !(p.pass_serial === passSerial && p.entry_type === entryType) && 
-        (p.name_1.toLowerCase() === name1.trim().toLowerCase() || 
-         (p.name_2 && p.name_2.toLowerCase() === name1.trim().toLowerCase()) ||
-         (name2 && p.name_1.toLowerCase() === name2.trim().toLowerCase()) ||
-         (name2 && p.name_2 && p.name_2.toLowerCase() === name2.trim().toLowerCase())
-        )
-      );
-      if (dupLocal) duplicateInfo = dupLocal;
-    }
+      if (matchError) {
+        console.error("Match error:", matchError);
+      }
 
-    if (duplicateInfo) {
-      setDuplicateNameWarning({ pass: duplicateInfo.pass_serial, type: duplicateInfo.entry_type });
-      return;
-    }
+      let duplicateInfo = null;
+      if (matches) {
+        const diffPass = matches.find(m => String(m.pass_serial).split('_')[0] !== String(passSerial));
+        if (diffPass) duplicateInfo = diffPass;
+      }
+      
+      if (!duplicateInfo) {
+        const dupLocal = preRegistered.find(p => 
+          !(String(p.pass_serial) === String(passSerial) && p.entry_type === entryType) && 
+          (String(p.name_1 || "").toLowerCase() === name1.trim().toLowerCase() || 
+           (p.name_2 && String(p.name_2).toLowerCase() === name1.trim().toLowerCase()) ||
+           (name2 && String(p.name_1 || "").toLowerCase() === name2.trim().toLowerCase()) ||
+           (name2 && p.name_2 && String(p.name_2).toLowerCase() === name2.trim().toLowerCase())
+          )
+        );
+        if (dupLocal) duplicateInfo = dupLocal;
+      }
 
-    submitEntry(false);
+      if (duplicateInfo) {
+        setDuplicateNameWarning({ 
+          pass: String(duplicateInfo.pass_serial), 
+          type: String(duplicateInfo.entry_type || "") 
+        });
+        return;
+      }
+
+      await submitEntry(false);
+    } catch (err: any) {
+      console.error(err);
+      setStatus("error");
+      setErrorMsg(err.message || "An unexpected error occurred.");
+    }
   };
 
   return (
@@ -265,7 +289,7 @@ export default function GateEntry() {
               <div className="bg-red-500/20 backdrop-blur-xl border border-red-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(239,68,68,0.3)] transform transition-all animate-bounce-in">
                 <AlertCircle className="w-20 h-20 text-red-400 mx-auto mb-6 drop-shadow-md" />
                 <h2 className="text-3xl font-black text-red-400 mb-2 uppercase tracking-widest drop-shadow-md">System Error</h2>
-                <p className="text-red-100 text-lg mb-8 font-medium">{errorMsg}</p>
+                <p className="text-red-100 text-lg mb-8 font-medium break-words">{errorMsg}</p>
                 <button 
                   onClick={() => setStatus("idle")}
                   className="w-full bg-red-500 hover:bg-red-400 text-white font-bold py-3 rounded-xl shadow-lg transition-colors text-lg"
@@ -284,7 +308,7 @@ export default function GateEntry() {
                 <h2 className="text-2xl font-black text-yellow-400 mb-2 uppercase tracking-wide drop-shadow-md">Name Exists!</h2>
                 <p className="text-yellow-100 text-[15px] mb-6 font-medium leading-relaxed">
                   This name is already registered under:<br/>
-                  <strong className="text-white text-lg block mt-2">{duplicateNameWarning.type.toUpperCase()} - {duplicateNameWarning.pass.split('_')[0]}</strong>
+                  <strong className="text-white text-lg block mt-2">{(duplicateNameWarning.type || "").toUpperCase()} - {(duplicateNameWarning.pass || "").split('_')[0]}</strong>
                 </p>
                 <div className="flex gap-3">
                   <button 
