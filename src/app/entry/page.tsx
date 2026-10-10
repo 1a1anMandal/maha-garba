@@ -29,6 +29,7 @@ export default function GateEntry() {
   const [errorMsg, setErrorMsg] = useState("");
   const [duplicateNameWarning, setDuplicateNameWarning] = useState<{pass: string, type: string} | null>(null);
   const [showTypePopup, setShowTypePopup] = useState(false);
+  const [dismissedPass, setDismissedPass] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pendingMatches, setPendingMatches] = useState<any[]>([]);
 
@@ -71,7 +72,7 @@ export default function GateEntry() {
       setIsChecking(false);
 
       // Autofill fields
-      setPassSerial(exactPassSerial);
+      setPassSerial(String(exactPassSerial));
       setEntryType(type as "stag" | "duo");
       setName1(match.name_1 || "");
       if (match.name_2) setName2(match.name_2);
@@ -90,8 +91,8 @@ export default function GateEntry() {
   // Autofill & Instant Check logic
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (passSerial.length >= 3 && !name1 && !showTypePopup && status === 'idle' && !isChecking) {
-        const matches = preRegistered.filter(p => p.pass_serial === passSerial || passSerial.endsWith(String(p.pass_serial)));
+      if (passSerial.length >= 3 && !name1 && !showTypePopup && status === 'idle' && !isChecking && passSerial !== dismissedPass) {
+        const matches = preRegistered.filter(p => String(p.pass_serial) === passSerial || passSerial.endsWith(String(p.pass_serial)));
         if (matches.length > 1) {
           setPendingMatches(matches);
           setShowTypePopup(true);
@@ -101,7 +102,12 @@ export default function GateEntry() {
       }
     }, 500);
     return () => clearTimeout(timer);
-  }, [passSerial, name1, showTypePopup, status, isChecking]);
+  }, [passSerial, name1, showTypePopup, status, isChecking, dismissedPass]);
+
+  const handleDismissTypePopup = () => {
+    setShowTypePopup(false);
+    setDismissedPass(passSerial);
+  };
 
   const handleSelectType = (selectedType: "stag" | "duo") => {
     const match = pendingMatches.find(m => m.entry_type === selectedType);
@@ -121,6 +127,7 @@ export default function GateEntry() {
     setDuplicateNameWarning(null);
     setShowTypePopup(false);
     setPendingMatches([]);
+    setDismissedPass("");
     setTimeout(() => {
       passInputRef.current?.focus();
     }, 100);
@@ -141,9 +148,9 @@ export default function GateEntry() {
         .from('entries')
         .insert([
           {
-            pass_serial: `${passSerial}_${entryType}_${date}`,
-            name_1: name1,
-            name_2: entryType === "duo" ? name2 : null,
+            pass_serial: `${String(passSerial).trim()}_${entryType}_${date}`,
+            name_1: name1.trim(),
+            name_2: entryType === "duo" ? name2.trim() : null,
             entry_type: entryType,
             entry_date: date,
           }
@@ -260,8 +267,8 @@ export default function GateEntry() {
 
           {/* Success Popup */}
           {status === "success" && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
-              <div className="bg-garba-green/20 backdrop-blur-xl border border-garba-green/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(34,197,94,0.3)] transform transition-all animate-bounce-in">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in" onClick={resetForm}>
+              <div className="bg-garba-green/20 backdrop-blur-xl border border-garba-green/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(34,197,94,0.3)] transform transition-all animate-bounce-in" onClick={(e) => e.stopPropagation()}>
                 <CheckCircle2 className="w-20 h-20 text-green-400 mx-auto mb-6 drop-shadow-md" />
                 <h2 className="text-3xl font-black text-green-400 mb-2 uppercase tracking-widest drop-shadow-md">Entry Granted</h2>
                 <p className="text-green-100 text-lg mb-8 font-medium">Welcome to Maha Garba!</p>
@@ -277,8 +284,8 @@ export default function GateEntry() {
 
           {/* Duplicate Popup */}
           {status === "duplicate" && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
-              <div className="bg-orange-500/20 backdrop-blur-xl border border-orange-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(249,115,22,0.3)] transform transition-all animate-bounce-in">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in" onClick={resetForm}>
+              <div className="bg-orange-500/20 backdrop-blur-xl border border-orange-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(249,115,22,0.3)] transform transition-all animate-bounce-in" onClick={(e) => e.stopPropagation()}>
                 <AlertCircle className="w-20 h-20 text-orange-400 mx-auto mb-6 drop-shadow-md" />
                 <h2 className="text-3xl font-black text-orange-400 mb-2 uppercase tracking-widest drop-shadow-md">Already Present</h2>
                 <p className="text-orange-100 text-lg mb-8 font-medium">This pass has already been marked for today.</p>
@@ -294,8 +301,8 @@ export default function GateEntry() {
 
           {/* Error Popup */}
           {status === "error" && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
-              <div className="bg-red-500/20 backdrop-blur-xl border border-red-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(239,68,68,0.3)] transform transition-all animate-bounce-in">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in" onClick={() => setStatus("idle")}>
+              <div className="bg-red-500/20 backdrop-blur-xl border border-red-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(239,68,68,0.3)] transform transition-all animate-bounce-in" onClick={(e) => e.stopPropagation()}>
                 <AlertCircle className="w-20 h-20 text-red-400 mx-auto mb-6 drop-shadow-md" />
                 <h2 className="text-3xl font-black text-red-400 mb-2 uppercase tracking-widest drop-shadow-md">System Error</h2>
                 <p className="text-red-100 text-lg mb-8 font-medium break-words">{errorMsg}</p>
@@ -311,8 +318,8 @@ export default function GateEntry() {
 
           {/* Duplicate Name Warning Popup */}
           {duplicateNameWarning && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
-              <div className="bg-yellow-500/20 backdrop-blur-xl border border-yellow-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(234,179,8,0.3)] transform transition-all animate-bounce-in">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in" onClick={() => setDuplicateNameWarning(null)}>
+              <div className="bg-yellow-500/20 backdrop-blur-xl border border-yellow-500/40 rounded-2xl p-8 max-w-sm w-full text-center shadow-[0_8px_32px_rgba(234,179,8,0.3)] transform transition-all animate-bounce-in" onClick={(e) => e.stopPropagation()}>
                 <AlertCircle className="w-20 h-20 text-yellow-400 mx-auto mb-6 drop-shadow-md" />
                 <h2 className="text-2xl font-black text-yellow-400 mb-2 uppercase tracking-wide drop-shadow-md">Name Exists!</h2>
                 <p className="text-yellow-100 text-[15px] mb-6 font-medium leading-relaxed">
@@ -342,8 +349,8 @@ export default function GateEntry() {
 
           {/* Type Choice Popup */}
           {showTypePopup && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in">
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 flex flex-col items-center gap-6 shadow-[0_8px_32px_rgba(255,255,255,0.1)] max-w-md w-full mx-4 transform transition-all animate-bounce-in">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-md animate-fade-in" onClick={handleDismissTypePopup}>
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 flex flex-col items-center gap-6 shadow-[0_8px_32px_rgba(255,255,255,0.1)] max-w-md w-full mx-4 transform transition-all animate-bounce-in" onClick={(e) => e.stopPropagation()}>
                 <div className="text-center">
                   <h3 className="font-black text-2xl text-garba-gold uppercase tracking-wider mb-2 drop-shadow-md">Select Pass Type</h3>
                   <p className="text-garba-light/90 font-medium">This pass number exists in multiple categories. Please choose.</p>
@@ -369,7 +376,7 @@ export default function GateEntry() {
                 </div>
                 
                 <button 
-                  onClick={() => setShowTypePopup(false)}
+                  onClick={handleDismissTypePopup}
                   className="mt-2 text-sm text-garba-light/60 hover:text-white transition-colors underline underline-offset-4"
                 >
                   Cancel
@@ -505,6 +512,3 @@ export default function GateEntry() {
     </>
   );
 }
-
-
-
