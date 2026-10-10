@@ -27,7 +27,7 @@ export default function GateEntry() {
   });
   
   const [errorMsg, setErrorMsg] = useState("");
-  const [duplicateNameWarning, setDuplicateNameWarning] = useState<{pass: string, type: string} | null>(null);
+  const [duplicateNameWarning, setDuplicateNameWarning] = useState<{pass: string, type: string, existingName: string, participantNum: number} | null>(null);
   const [showTypePopup, setShowTypePopup] = useState(false);
   const [dismissedPass, setDismissedPass] = useState("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,14 +90,56 @@ export default function GateEntry() {
 
   // Autofill & Instant Check logic
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       if (passSerial.length >= 3 && !name1 && !showTypePopup && status === 'idle' && !isChecking && passSerial !== dismissedPass) {
-        const matches = preRegistered.filter(p => String(p.pass_serial) === passSerial || passSerial.endsWith(String(p.pass_serial)));
-        if (matches.length > 1) {
-          setPendingMatches(matches);
-          setShowTypePopup(true);
-        } else if (matches.length === 1) {
-          checkAndAutofill(matches[0]);
+        setIsChecking(true);
+        try {
+          // 1. Fetch from entries for historical/recent data
+          const { data: dbMatches } = await supabase
+            .from('entries')
+            .select('*')
+            .ilike('pass_serial', `${passSerial.trim()}_%`);
+
+          const map = new Map();
+          
+          // Add preRegistered matches
+          preRegistered.forEach(p => {
+            if (String(p.pass_serial) === passSerial.trim() || passSerial.trim().endsWith(String(p.pass_serial))) {
+              map.set(p.entry_type, p);
+            }
+          });
+
+          // Override with DB matches (they are more recent/accurate)
+          if (dbMatches) {
+            // Sort by entry_date descending so we get the latest names
+            dbMatches.sort((a,b) => b.entry_date.localeCompare(a.entry_date));
+            dbMatches.forEach(m => {
+              const type = m.entry_type;
+              // pass_serial is like 005_stag_2026-10-10
+              const matchObj = {
+                pass_serial: m.pass_serial.split('_')[0],
+                entry_type: type,
+                name_1: m.name_1,
+                name_2: m.name_2
+              };
+              if (!map.has(type)) {
+                map.set(type, matchObj);
+              }
+            });
+          }
+
+          const combinedMatches = Array.from(map.values());
+
+          if (combinedMatches.length > 1) {
+            setPendingMatches(combinedMatches);
+            setShowTypePopup(true);
+          } else if (combinedMatches.length === 1) {
+            checkAndAutofill(combinedMatches[0]);
+          }
+        } catch (err) {
+          console.error("Auto-fill error:", err);
+        } finally {
+          setIsChecking(false);
         }
       }
     }, 500);
@@ -114,6 +156,61 @@ export default function GateEntry() {
     setShowTypePopup(false);
     if (match) {
       checkAndAutofill(match);
+    }
+  };
+
+  const handleNameBlur = async (name: string) => {
+    if (!name || !name.trim().includes(' ')) return;
+    setIsChecking(true);
+    try {
+      // Use exact match or ILIKE for full name duplicate detection
+      const { data: matches, error } = await supabase
+        .from('entries')
+        .select('pass_serial, entry_type, name_1, name_2')
+        .or(`name_1.ilike."${name.trim()}",name_2.ilike."${name.trim()}"`)
+        .limit(10);
+        
+      if (error) throw error;
+      
+      let duplicateInfo = null;
+      if (matches && matches.length > 0) {
+        // Find match that is NOT the same pass number
+        const diffPass = matches.find(m => String(m.pass_serial).split('_')[0] !== String(passSerial).trim());
+        if (diffPass) duplicateInfo = diffPass;
+      }
+      
+      if (!duplicateInfo) {
+        const dupLocal = preRegistered.find(p => 
+          !(String(p.pass_serial) === String(passSerial).trim() && p.entry_type === entryType) && 
+          (String(p.name_1 || "").toLowerCase() === name.trim().toLowerCase() || 
+           (p.name_2 && String(p.name_2).toLowerCase() === name.trim().toLowerCase())
+          )
+        );
+        if (dupLocal) duplicateInfo = dupLocal;
+      }
+
+      if (duplicateInfo) {
+        let existingName = name.trim();
+        let participantNum = 1;
+        if (duplicateInfo.name_1 && String(duplicateInfo.name_1).toLowerCase() === name.trim().toLowerCase()) {
+          existingName = String(duplicateInfo.name_1);
+          participantNum = 1;
+        } else if (duplicateInfo.name_2 && String(duplicateInfo.name_2).toLowerCase() === name.trim().toLowerCase()) {
+          existingName = String(duplicateInfo.name_2);
+          participantNum = 2;
+        }
+
+        setDuplicateNameWarning({ 
+          pass: String(duplicateInfo.pass_serial), 
+          type: String(duplicateInfo.entry_type || ""),
+          existingName,
+          participantNum
+        });
+      }
+    } catch (err) {
+      console.error("Name validation error:", err);
+    } finally {
+      setIsChecking(false);
     }
   };
 
@@ -184,17 +281,23 @@ export default function GateEntry() {
       setErrorMsg("Participant 1 must have a Full Name (First and Last Name).");
       return;
     }
-    if (name2 && !name2.trim().includes(' ')) {
+    if (entryType === "duo" && name2 && !name2.trim().includes(' ')) {
       setStatus("error");
       setErrorMsg("Participant 2 must have a Full Name (First and Last Name).");
       return;
+    }
+
+    // Don't re-run the full name query on submit if the duplicate warning is already showing.
+    // If it's not showing, double-check just in case they typed fast and hit Enter before onBlur fired.
+    if (duplicateNameWarning) {
+      return; // Force user to click "Proceed Anyway" or "Cancel" on the warning
     }
 
     try {
       const orQuery = `name_1.ilike."${name1.trim()}",name_2.ilike."${name1.trim()}"` + (name2 ? `,name_1.ilike."${name2.trim()}",name_2.ilike."${name2.trim()}"` : "");
       const { data: matches, error: matchError } = await supabase
         .from('entries')
-        .select('pass_serial, entry_type')
+        .select('pass_serial, entry_type, name_1, name_2')
         .or(orQuery)
         .limit(10);
 
@@ -221,9 +324,28 @@ export default function GateEntry() {
       }
 
       if (duplicateInfo) {
+        let existingName = name1.trim();
+        let participantNum = 1;
+        
+        if (duplicateInfo.name_1 && String(duplicateInfo.name_1).toLowerCase() === name1.trim().toLowerCase()) {
+          existingName = String(duplicateInfo.name_1);
+          participantNum = 1;
+        } else if (duplicateInfo.name_2 && String(duplicateInfo.name_2).toLowerCase() === name1.trim().toLowerCase()) {
+          existingName = String(duplicateInfo.name_2);
+          participantNum = 2;
+        } else if (name2 && duplicateInfo.name_1 && String(duplicateInfo.name_1).toLowerCase() === name2.trim().toLowerCase()) {
+          existingName = String(duplicateInfo.name_1);
+          participantNum = 1;
+        } else if (name2 && duplicateInfo.name_2 && String(duplicateInfo.name_2).toLowerCase() === name2.trim().toLowerCase()) {
+          existingName = String(duplicateInfo.name_2);
+          participantNum = 2;
+        }
+
         setDuplicateNameWarning({ 
           pass: String(duplicateInfo.pass_serial), 
-          type: String(duplicateInfo.entry_type || "") 
+          type: String(duplicateInfo.entry_type || ""),
+          existingName,
+          participantNum
         });
         return;
       }
@@ -323,8 +445,9 @@ export default function GateEntry() {
                 <AlertCircle className="w-20 h-20 text-yellow-400 mx-auto mb-6 drop-shadow-md" />
                 <h2 className="text-2xl font-black text-yellow-400 mb-2 uppercase tracking-wide drop-shadow-md">Name Exists!</h2>
                 <p className="text-yellow-100 text-[15px] mb-6 font-medium leading-relaxed">
-                  This name is already registered under:<br/>
-                  <strong className="text-white text-lg block mt-2">{(duplicateNameWarning.type || "").toUpperCase()} - {(duplicateNameWarning.pass || "").split('_')[0]}</strong>
+                  The name <strong className="text-white">"{duplicateNameWarning.existingName}"</strong> is already registered under:<br/>
+                  <strong className="text-white text-lg block mt-2">{(duplicateNameWarning.type || "").toUpperCase()} PASS - {(duplicateNameWarning.pass || "").split('_')[0]}</strong>
+                  <span className="text-white/70 text-sm mt-1 block">As Participant {duplicateNameWarning.participantNum}</span>
                 </p>
                 <div className="flex gap-3">
                   <button 
@@ -445,6 +568,7 @@ export default function GateEntry() {
                   type="text" 
                   value={name1}
                   onChange={(e) => setName1(e.target.value)}
+                  onBlur={() => handleNameBlur(name1)}
                   placeholder="Enter name"
                   className="w-full bg-garba-darkred border-2 border-garba-gold/30 rounded-xl py-3 px-4 text-white placeholder:text-white/40 focus:outline-none focus:border-garba-gold transition-colors"
                 />
@@ -457,6 +581,7 @@ export default function GateEntry() {
                     type="text" 
                     value={name2}
                     onChange={(e) => setName2(e.target.value)}
+                    onBlur={() => handleNameBlur(name2)}
                     placeholder="Enter second name (optional)"
                     className="w-full bg-garba-darkred border-2 border-garba-gold/30 rounded-xl py-3 px-4 text-white placeholder:text-white/40 focus:outline-none focus:border-garba-gold transition-colors"
                   />
