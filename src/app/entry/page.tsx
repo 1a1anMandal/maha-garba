@@ -39,6 +39,15 @@ export default function GateEntry() {
       const { data } = await supabase.auth.getSession();
       if (!data.session) {
         router.push('/');
+        return;
+      }
+      const ADMIN_EMAIL = "milankr.mandal2000@gmail.com";
+      if (data.session.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        const { data: profile } = await supabase.from('profiles').select('status').eq('id', data.session.user.id).single();
+        if (!profile || profile.status !== 'approved') {
+          await supabase.auth.signOut();
+          router.push('/');
+        }
       }
     };
     checkAuth();
@@ -188,13 +197,13 @@ export default function GateEntry() {
 
       let duplicateInfo = null;
       if (matches) {
-        const diffPass = matches.find(m => String(m.pass_serial).split('_')[0] !== String(passSerial));
+        const diffPass = matches.find(m => String(m.pass_serial).split('_')[0] !== String(passSerial).trim());
         if (diffPass) duplicateInfo = diffPass;
       }
       
       if (!duplicateInfo) {
         const dupLocal = preRegistered.find(p => 
-          !(String(p.pass_serial) === String(passSerial) && p.entry_type === entryType) && 
+          !(String(p.pass_serial) === String(passSerial).trim() && p.entry_type === entryType) && 
           (String(p.name_1 || "").toLowerCase() === name1.trim().toLowerCase() || 
            (p.name_2 && String(p.name_2).toLowerCase() === name1.trim().toLowerCase()) ||
            (name2 && String(p.name_1 || "").toLowerCase() === name2.trim().toLowerCase()) ||
@@ -496,3 +505,6 @@ export default function GateEntry() {
     </>
   );
 }
+
+
+

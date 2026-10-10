@@ -48,6 +48,11 @@ export default function AdminDashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push('/');
+        return;
+      }
+      const ADMIN_EMAIL = "milankr.mandal2000@gmail.com";
+      if (session.user.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        router.push('/entry');
       }
     };
     checkAuth();
@@ -59,6 +64,9 @@ export default function AdminDashboard() {
       .channel('public:entries')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'entries' }, (payload) => {
         setEntries(prev => [payload.new, ...prev]);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+        fetchRequests();
       })
       .subscribe();
 
@@ -489,3 +497,5 @@ function StatCard({ title, value, icon, color, active, onClick }: { title: strin
     </div>
   );
 }
+
+
