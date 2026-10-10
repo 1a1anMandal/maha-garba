@@ -25,7 +25,31 @@ export default function AdminDashboard() {
   // Expand State
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
+  const fetchEntries = async () => {
+    const { data } = await supabase
+      .from('entries')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (data) setEntries(data);
+    setLoading(false);
+  };
+
+  const fetchRequests = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('status', 'pending');
+    if (data) setRequests(data);
+  };
+
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/');
+      }
+    };
     checkAuth();
     fetchEntries();
     fetchRequests();
@@ -41,36 +65,11 @@ export default function AdminDashboard() {
     return () => {
       supabase.removeChannel(channel);
     }
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      router.push('/');
-    }
-  };
+  }, [router]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
-  };
-
-  const fetchEntries = async () => {
-    const { data, error } = await supabase
-      .from('entries')
-      .select('*')
-      .order('created_at', { ascending: false });
-      
-    if (data) setEntries(data);
-    setLoading(false);
-  };
-
-  const fetchRequests = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('status', 'pending');
-    if (data) setRequests(data);
   };
 
   const handleApprove = async (id: string) => {
@@ -154,7 +153,7 @@ export default function AdminDashboard() {
       headerRow.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
       headerRow.height = 20;
       
-      headerRow.eachCell((cell) => {
+      headerRow.eachCell((cell: any) => {
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF800000' } };
         cell.alignment = { horizontal: 'center', vertical: 'middle' };
         cell.border = {
@@ -180,7 +179,7 @@ export default function AdminDashboard() {
           timeStr
         ]);
         
-        dataRow.eachCell((cell) => {
+        dataRow.eachCell((cell: any) => {
           cell.alignment = { horizontal: 'center', vertical: 'middle' };
           cell.border = {
             top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }
@@ -188,7 +187,7 @@ export default function AdminDashboard() {
         });
       });
 
-      const buffer = await workbook.xlsx.writeBuffer();
+      const buffer = await (workbook.xlsx as any).writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       
       let fileName = 'Maha_Garba_Entries';

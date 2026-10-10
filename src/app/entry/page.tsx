@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, CheckCircle2, AlertCircle, User, Users, Calendar, Ticket, LogOut } from "lucide-react";
+import { CheckCircle2, AlertCircle, User, Users, Calendar, Ticket, LogOut } from "lucide-react";
 import { DandiyaIcon } from "@/components/DandiyaIcon";
 import preRegistered from "@/lib/preRegistered.json";
 
@@ -16,7 +16,13 @@ export default function GateEntry() {
   const [name2, setName2] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "duplicate" | "error">("idle");
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState("");
+  const [date] = useState(() => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
   const [errorMsg, setErrorMsg] = useState("");
   const [duplicateNameWarning, setDuplicateNameWarning] = useState<{pass: string, type: string} | null>(null);
   const [showTypePopup, setShowTypePopup] = useState(false);
@@ -25,15 +31,15 @@ export default function GateEntry() {
   const passInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/');
+      }
+    };
     checkAuth();
     passInputRef.current?.focus();
-    const today = new Date();
-    // format as YYYY-MM-DD for DB
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    setDate(`${yyyy}-${mm}-${dd}`);
-  }, []);
+  }, [router]);
 
   // Autofill logic
   useEffect(() => {
@@ -63,12 +69,6 @@ export default function GateEntry() {
     setShowTypePopup(false);
   };
 
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      router.push('/');
-    }
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
