@@ -3,6 +3,7 @@ import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { Users, User, Ticket, Calendar, Download, Search, LayoutDashboard, LogOut, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { DandiyaIcon } from "@/components/DandiyaIcon";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 
@@ -24,6 +25,20 @@ export default function AdminDashboard() {
   
   // Expand State
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
+
+  // Click outside to close export menu
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('#export-menu-container')) {
+        setExportMenuOpen(false);
+      }
+    };
+    if (exportMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [exportMenuOpen]);
 
   const fetchEntries = async () => {
     const { data } = await supabase
@@ -332,64 +347,74 @@ export default function AdminDashboard() {
     <>
       <div className="bg-app"></div>
       <div className="bg-overlay"></div>
-      <div className="relative z-10 min-h-screen p-4 sm:p-8">
+      <div className="relative z-10 min-h-screen px-3 py-4 sm:p-8">
       
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-6xl mx-auto space-y-5 sm:space-y-8">
         
         {/* Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-center ornate-card p-6">
-          <div className="flex items-center gap-4">
-            <div className="bg-garba-gold p-3 rounded-xl">
-              <LayoutDashboard className="w-8 h-8 text-garba-maroon" />
-            </div>
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center ornate-card p-4 sm:p-6 gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+            <DandiyaIcon className="w-10 sm:w-12 h-auto shrink-0" />
             <div>
-              <h1 className="text-3xl font-black text-garba-gold uppercase tracking-widest font-[family-name:var(--font-rozha)] text-glow">
+              <div className="mb-0.5">
+                <img 
+                  src="/maha-garba-title-only.png" 
+                  alt="Maha Garba" 
+                  className="h-5 sm:h-6 w-auto object-contain drop-shadow-[0_2px_10px_rgba(245,183,0,0.4)] pointer-events-none"
+                />
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-garba-gold uppercase tracking-wider font-[family-name:var(--font-rozha)] text-glow select-none">
                 Admin Dashboard
               </h1>
-              <p className="text-garba-light/80 font-semibold tracking-wide">Maha Garba Event Management</p>
+              <p className="text-garba-light/80 text-[11px] sm:text-xs font-semibold tracking-wide select-none">Maha Garba Event Management</p>
             </div>
           </div>
-          <div className="mt-4 sm:mt-0 flex gap-4">
-            <div className="relative">
+          <div className="flex items-center gap-2.5 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+            <div id="export-menu-container" className="relative flex-1 sm:flex-initial">
               <button 
+                type="button"
                 onClick={() => setExportMenuOpen(!exportMenuOpen)}
                 disabled={isExporting}
-                className="flex items-center gap-2 bg-garba-green hover:bg-green-600 px-4 py-2 rounded-lg font-bold transition-colors disabled:opacity-70"
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-garba-green hover:bg-green-600 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-colors disabled:opacity-70 cursor-pointer touch-manipulation select-none active:opacity-90"
               >
-                {isExporting ? <span className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></span> : <Download className="w-5 h-5" />}
-                {isExporting ? 'Exporting...' : 'Export Data'}
-                <ChevronDown className="w-4 h-4" />
+                {isExporting ? <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full pointer-events-none"></span> : <Download className="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />}
+                <span className="pointer-events-none">{isExporting ? 'Exporting...' : 'Export Data'}</span>
+                <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 pointer-events-none" />
               </button>
               {exportMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-xl border border-garba-gold/30 rounded-lg shadow-xl overflow-hidden z-50">
-                  <button onClick={() => handleExport('all')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-white font-semibold border-b border-garba-gold/10 transition-colors">
+                <div className="absolute left-0 sm:left-auto right-0 mt-2 w-full sm:w-52 bg-black/95 backdrop-blur-xl border border-garba-gold/30 rounded-lg shadow-xl overflow-hidden z-50 animate-fade-in">
+                  <button type="button" onClick={() => handleExport('all')} className="w-full text-left px-4 py-2.5 sm:py-3 hover:bg-garba-gold/20 text-white font-semibold text-sm border-b border-garba-gold/10 transition-colors cursor-pointer touch-manipulation select-none">
                     Export All Entries
                   </button>
-                  <button onClick={() => handleExport('duo')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-blue-300 font-semibold border-b border-garba-gold/10 transition-colors">
+                  <button type="button" onClick={() => handleExport('duo')} className="w-full text-left px-4 py-2.5 sm:py-3 hover:bg-garba-gold/20 text-blue-300 font-semibold text-sm border-b border-garba-gold/10 transition-colors cursor-pointer touch-manipulation select-none">
                     Export Duo Only
                   </button>
-                  <button onClick={() => handleExport('stag')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-garba-green font-semibold border-b border-garba-gold/10 transition-colors">
+                  <button type="button" onClick={() => handleExport('stag')} className="w-full text-left px-4 py-2.5 sm:py-3 hover:bg-garba-gold/20 text-garba-green font-semibold text-sm border-b border-garba-gold/10 transition-colors cursor-pointer touch-manipulation select-none">
                     Export Stag Only
                   </button>
-                  <button onClick={() => handleExport('filtered')} className="w-full text-left px-4 py-3 hover:bg-garba-gold/20 text-garba-gold font-semibold transition-colors">
+                  <button type="button" onClick={() => handleExport('filtered')} className="w-full text-left px-4 py-2.5 sm:py-3 hover:bg-garba-gold/20 text-garba-gold font-semibold text-sm transition-colors cursor-pointer touch-manipulation select-none">
                     Export Filtered View
                   </button>
                 </div>
               )}
             </div>
-            <button onClick={handleLogout} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-bold transition-colors">
-              <LogOut className="w-5 h-5" />
-              Logout
+            <button 
+              type="button"
+              onClick={handleLogout} 
+              className="flex items-center justify-center gap-1.5 sm:gap-2 bg-red-600 hover:bg-red-700 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg font-bold text-sm sm:text-base transition-colors cursor-pointer touch-manipulation select-none active:opacity-90 shrink-0"
+            >
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
+              <span className="pointer-events-none">Logout</span>
             </button>
           </div>
         </header>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+        {/* Stats Grid: 2 columns on mobile, 4 columns on large */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6 animate-fade-in">
           <StatCard 
             title="Total Passes" 
             value={totalEntries.toString()} 
-            icon={<Users />} 
+            icon={<Users className="w-4 h-4 sm:w-6 sm:h-6" />} 
             color="garba-gold" 
             active={filterType === 'all'}
             onClick={() => setFilterType('all')}
@@ -397,7 +422,7 @@ export default function AdminDashboard() {
           <StatCard 
             title="Stag Passes" 
             value={stagCount.toString()} 
-            icon={<User />} 
+            icon={<User className="w-4 h-4 sm:w-6 sm:h-6" />} 
             color="garba-green" 
             active={filterType === 'stag'}
             onClick={() => setFilterType('stag')}
@@ -405,7 +430,7 @@ export default function AdminDashboard() {
           <StatCard 
             title="Duo Passes" 
             value={duoCount.toString()} 
-            icon={<Ticket />} 
+            icon={<Ticket className="w-4 h-4 sm:w-6 sm:h-6" />} 
             color="blue-400" 
             active={filterType === 'duo'}
             onClick={() => setFilterType('duo')}
@@ -413,34 +438,36 @@ export default function AdminDashboard() {
           <StatCard 
             title="Current View" 
             value={displayData.length.toString()} 
-            icon={<Calendar />} 
+            icon={<Calendar className="w-4 h-4 sm:w-6 sm:h-6" />} 
             color="purple-400" 
           />
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 border-b border-garba-gold/20 pb-2">
+        <div className="flex gap-2 sm:gap-4 border-b border-garba-gold/20 pb-1 sm:pb-2 text-xs sm:text-sm">
           <button 
+            type="button"
             onClick={() => setActiveTab('entries')}
-            className={`font-bold uppercase tracking-wider px-4 py-2 transition-colors ${activeTab === 'entries' ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 hover:text-garba-light'}`}
+            className={`font-bold uppercase tracking-wider px-3 sm:px-4 py-1.5 sm:py-2 transition-colors cursor-pointer touch-manipulation select-none ${activeTab === 'entries' ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 hover:text-garba-light'}`}
           >
             Gate Entries
           </button>
           <button 
+            type="button"
             onClick={() => setActiveTab('requests')}
-            className={`font-bold uppercase tracking-wider px-4 py-2 transition-colors flex items-center gap-2 ${activeTab === 'requests' ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 hover:text-garba-light'}`}
+            className={`font-bold uppercase tracking-wider px-3 sm:px-4 py-1.5 sm:py-2 transition-colors flex items-center gap-1.5 sm:gap-2 cursor-pointer touch-manipulation select-none ${activeTab === 'requests' ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 hover:text-garba-light'}`}
           >
-            Access Requests {requests.length > 0 && <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">{requests.length}</span>}
+            Access Requests {requests.length > 0 && <span className="bg-red-600 text-white text-[11px] px-1.5 py-0.5 rounded-full">{requests.length}</span>}
           </button>
         </div>
 
         {/* Dynamic Section */}
         {activeTab === 'entries' ? (
           <div className="ornate-card overflow-hidden flex flex-col animate-fade-in-down">
-            <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Entries</h2>
-                <div className="flex gap-3 text-xs font-bold uppercase tracking-wider">
+            <div className="p-4 sm:p-6 border-b border-garba-gold/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-3.5 sm:gap-4">
+              <div className="flex flex-col gap-1 w-full md:w-auto">
+                <h2 className="text-lg sm:text-xl font-bold text-garba-gold uppercase tracking-wider">Entries</h2>
+                <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wider">
                   <span className="text-purple-400 bg-purple-400/10 px-2 py-0.5 rounded">
                     Total: {displayData.length}
                   </span>
@@ -452,77 +479,77 @@ export default function AdminDashboard() {
                   </span>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-4 w-full md:w-auto">
                 <select 
                   value={filterDate} 
                   onChange={(e) => setFilterDate(e.target.value)}
-                  className="bg-black/40 border border-garba-gold/30 rounded-lg py-2 px-4 text-white font-semibold focus:outline-none focus:border-garba-gold transition-colors"
+                  className="bg-black/40 border border-garba-gold/30 rounded-lg py-2 px-3 sm:px-4 text-white font-semibold focus:outline-none focus:border-garba-gold transition-colors cursor-pointer text-sm sm:text-base w-full sm:w-auto"
                 >
                   <option value="all">All Dates</option>
                   {uniqueDates.map(d => <option key={d as string} value={d as string}>{d as string}</option>)}
                 </select>
-                <div className="relative w-full sm:w-72">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-garba-light/50" />
+                <div className="relative w-full md:w-72">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-garba-light/50 pointer-events-none" />
                   <input 
                     type="text" 
                     placeholder="Search pass or name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-black/40 border border-garba-gold/30 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:border-garba-gold transition-colors"
+                    className="w-full bg-black/40 border border-garba-gold/30 rounded-lg py-2 pl-9 sm:pl-10 pr-3 sm:pr-4 text-white focus:outline-none focus:border-garba-gold transition-colors text-sm sm:text-base"
                   />
                 </div>
               </div>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-black/40 text-garba-gold text-sm uppercase">
+              <table className="w-full text-left min-w-[600px] sm:min-w-full">
+                <thead className="bg-black/40 text-garba-gold text-xs sm:text-sm uppercase">
                   <tr>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Pass Serial</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Name(s)</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Type</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Date</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Time</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider"></th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Pass Serial</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Name(s)</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Type</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Date</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Time</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider"></th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-garba-gold/10 text-garba-light">
+                <tbody className="divide-y divide-garba-gold/10 text-garba-light text-xs sm:text-sm">
                   {loading ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center opacity-70 animate-pulse">Loading entries...</td>
+                      <td colSpan={6} className="px-3 sm:px-6 py-8 text-center opacity-70 animate-pulse">Loading entries...</td>
                     </tr>
                   ) : displayData.map((row) => (
                     <Fragment key={row.id}>
                       <tr 
-                        className={`hover:bg-white/5 transition-colors cursor-pointer ${expandedRowId === row.id ? 'bg-white/5' : ''}`}
+                        className={`hover:bg-white/5 transition-colors cursor-pointer select-none ${expandedRowId === row.id ? 'bg-white/5' : ''}`}
                         onClick={() => setExpandedRowId(expandedRowId === row.id ? null : row.id)}
                       >
-                        <td className="px-6 py-4 font-mono text-garba-gold">{row.pass_serial.split('_')[0]}</td>
-                        <td className="px-6 py-4 font-semibold">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 font-mono text-garba-gold text-sm sm:text-base">{row.pass_serial.split('_')[0]}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 font-semibold">
                           {row.name_1} {row.name_2 && <span className="text-garba-light/80"><br/>& {row.name_2}</span>}
                         </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                        <td className="px-3 sm:px-6 py-3 sm:py-4">
+                          <span className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase ${
                             row.entry_type === 'stag' ? 'bg-garba-green/20 text-garba-green' : 'bg-blue-500/20 text-blue-400'
                           }`}>
                             {row.entry_type}
                           </span>
                         </td>
-                        <td className="px-6 py-4 opacity-80">{row.entry_date}</td>
-                        <td className="px-6 py-4 opacity-80">{new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
-                        <td className="px-6 py-4 text-right">
-                          {expandedRowId === row.id ? <ChevronUp className="w-5 h-5 text-garba-gold inline-block" /> : <ChevronDown className="w-5 h-5 text-garba-light/50 inline-block" />}
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 opacity-80 whitespace-nowrap">{row.entry_date}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 opacity-80 whitespace-nowrap">{new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}</td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-right">
+                          {expandedRowId === row.id ? <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-garba-gold inline-block pointer-events-none" /> : <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-garba-light/50 inline-block pointer-events-none" />}
                         </td>
                       </tr>
                       {expandedRowId === row.id && (
                         <tr className="bg-black/40">
-                          <td colSpan={6} className="px-6 py-4 border-t-0">
-                            <div className="flex flex-col gap-3 p-2">
-                              <h4 className="text-garba-gold text-sm font-bold uppercase tracking-wider">Attendance History for Pass {row.pass_serial.split('_')[0]}</h4>
-                              <div className="flex flex-wrap gap-2">
+                          <td colSpan={6} className="px-3 sm:px-6 py-3 sm:py-4 border-t-0">
+                            <div className="flex flex-col gap-2 p-1 sm:p-2">
+                              <h4 className="text-garba-gold text-xs sm:text-sm font-bold uppercase tracking-wider">Attendance History for Pass {row.pass_serial.split('_')[0]}</h4>
+                              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                 {entries.filter(e => e.pass_serial.split('_')[0] === row.pass_serial.split('_')[0] && e.entry_type === row.entry_type).sort((a,b) => a.entry_date.localeCompare(b.entry_date)).map(historyEntry => (
-                                  <span key={historyEntry.id} className="bg-white/10 text-garba-light px-3 py-1.5 rounded-lg border border-white/20 text-sm flex items-center gap-2">
-                                    <Calendar className="w-3 h-3 text-garba-gold" />
+                                  <span key={historyEntry.id} className="bg-white/10 text-garba-light px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-white/20 text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2">
+                                    <Calendar className="w-3 h-3 text-garba-gold pointer-events-none" />
                                     {historyEntry.entry_date}
                                   </span>
                                 ))}
@@ -536,7 +563,7 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
               {!loading && displayData.length === 0 && (
-                <div className="p-8 text-center text-garba-light/50">
+                <div className="p-6 sm:p-8 text-center text-garba-light/50 text-sm sm:text-base">
                   No entries found matching your filters.
                 </div>
               )}
@@ -544,34 +571,42 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <div className="ornate-card overflow-hidden flex flex-col animate-fade-in-down">
-            <div className="p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <h2 className="text-xl font-bold text-garba-gold uppercase tracking-wider">Pending Operator Requests</h2>
+            <div className="p-4 sm:p-6 border-b border-garba-gold/20 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <h2 className="text-lg sm:text-xl font-bold text-garba-gold uppercase tracking-wider">Pending Operator Requests</h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-black/40 text-garba-gold text-sm uppercase">
+              <table className="w-full text-left min-w-[500px] sm:min-w-full">
+                <thead className="bg-black/40 text-garba-gold text-xs sm:text-sm uppercase">
                   <tr>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Full Name</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Email</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider">Request Date</th>
-                    <th className="px-6 py-4 font-semibold tracking-wider text-right">Actions</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Full Name</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Email</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider">Request Date</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 font-semibold tracking-wider text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-garba-gold/10 text-garba-light">
+                <tbody className="divide-y divide-garba-gold/10 text-garba-light text-xs sm:text-sm">
                   {requests.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-8 text-center opacity-70">No pending access requests.</td>
+                      <td colSpan={4} className="px-3 sm:px-6 py-8 text-center opacity-70">No pending access requests.</td>
                     </tr>
                   ) : requests.map((req) => (
                     <tr key={req.id} className="hover:bg-white/5 transition-colors">
-                      <td className="px-6 py-4 font-bold">{req.full_name}</td>
-                      <td className="px-6 py-4 opacity-90">{req.email}</td>
-                      <td className="px-6 py-4 opacity-80">{new Date(req.created_at).toLocaleDateString('en-IN')}</td>
-                      <td className="px-6 py-4 text-right space-x-3">
-                        <button onClick={() => handleApprove(req.id)} className="bg-garba-green hover:bg-green-600 text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 font-bold">{req.full_name}</td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 opacity-90 break-all">{req.email}</td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 opacity-80 whitespace-nowrap">{new Date(req.created_at).toLocaleDateString('en-IN')}</td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-right space-x-2 sm:space-x-3 whitespace-nowrap">
+                        <button 
+                          type="button"
+                          onClick={() => handleApprove(req.id)} 
+                          className="bg-garba-green hover:bg-green-600 text-white px-3 sm:px-4 py-1.5 rounded-lg font-bold text-xs sm:text-sm transition-colors cursor-pointer touch-manipulation select-none active:opacity-90"
+                        >
                           Approve
                         </button>
-                        <button onClick={() => handleReject(req.id)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg font-bold text-sm transition-colors">
+                        <button 
+                          type="button"
+                          onClick={() => handleReject(req.id)} 
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-1.5 rounded-lg font-bold text-xs sm:text-sm transition-colors cursor-pointer touch-manipulation select-none active:opacity-90"
+                        >
                           Reject
                         </button>
                       </td>
@@ -601,14 +636,14 @@ function StatCard({ title, value, icon, color, active, onClick }: { title: strin
   return (
     <div 
       onClick={onClick} 
-      className={`ornate-card p-6 flex items-center gap-4 transition-all ${onClick ? 'cursor-pointer hover:border-garba-gold' : ''} ${active ? 'border-garba-gold bg-garba-gold/20 scale-[1.02]' : 'border-garba-gold/30'}`}
+      className={`ornate-card p-3 sm:p-5 flex items-center gap-2.5 sm:gap-4 transition-all touch-manipulation select-none ${onClick ? 'cursor-pointer hover:border-garba-gold active:opacity-90' : ''} ${active ? 'border-garba-gold bg-garba-gold/20 scale-[1.01]' : 'border-garba-gold/30'}`}
     >
-      <div className={`p-4 rounded-xl ${bgColor} ${iconColor}`}>
+      <div className={`p-2 sm:p-3.5 rounded-lg sm:rounded-xl ${bgColor} ${iconColor} pointer-events-none shrink-0`}>
         {icon}
       </div>
-      <div>
-        <p className="text-garba-light/70 text-sm font-semibold uppercase tracking-wide">{title}</p>
-        <p className="text-3xl font-bold text-white mt-1">{value}</p>
+      <div className="pointer-events-none min-w-0">
+        <p className="text-garba-light/70 text-[11px] sm:text-xs md:text-sm font-semibold uppercase tracking-wide truncate">{title}</p>
+        <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5 sm:mt-1">{value}</p>
       </div>
     </div>
   );

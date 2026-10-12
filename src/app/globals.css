@@ -15,30 +15,56 @@
   --foreground: #fff8e1;
 }
 
-body {
+html, body {
   background-color: var(--background);
   color: var(--foreground);
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Global Background Base */
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+input, select, textarea {
+  font-size: 16px; /* Prevents auto-zoom on mobile iOS Safari */
+}
+
+/* Global Background Base: Mobile-first */
 .bg-app {
   position: fixed;
   inset: 0;
-  background-image: url('/bg-clean.jpg');
+  background-image: url('/bg-mobile.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: center top;
   background-repeat: no-repeat;
   z-index: -2;
   pointer-events: none;
 }
 
+@media (min-width: 768px) {
+  .bg-app {
+    background-image: url('/bg-clean.jpg');
+    background-position: center center;
+  }
+}
+
 .bg-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(18, 0, 0, 0.45);
   z-index: -1;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .bg-overlay {
+    background: rgba(0, 0, 0, 0.3);
+  }
 }
 
 /* Base Card Style - Dark translucent with Gold Border */
@@ -91,6 +117,7 @@ body {
   background-position: center;
   background-repeat: repeat-x;
   height: 16px;
+  pointer-events: none;
 }
 
 /* Subtitle lines */

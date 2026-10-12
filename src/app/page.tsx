@@ -106,33 +106,37 @@ export default function Login() {
     <>
       <div className="bg-app"></div>
       <div className="bg-overlay"></div>
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4 sm:p-8">
-      <div className="text-center mb-8 animate-fade-in-down flex flex-col items-center">
-        <DandiyaIcon className="w-16 h-16 mb-2" />
-        <h1 className="text-4xl sm:text-6xl font-black text-garba-gold text-glow uppercase tracking-wider font-[family-name:var(--font-rozha)]">
-          Maha Garba
-        </h1>
-        <div className="subtitle-lines w-full mt-2">
-          <p className="text-garba-light text-sm sm:text-base tracking-[0.3em] font-semibold uppercase whitespace-nowrap px-4">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-3 py-6 sm:p-8">
+      <div className="text-center mb-5 sm:mb-7 animate-fade-in-down flex flex-col items-center select-none">
+        <DandiyaIcon className="w-24 sm:w-28 h-auto mb-1.5" />
+        <img 
+          src="/maha-garba-title-only.png" 
+          alt="Maha Garba" 
+          className="w-full max-w-[280px] sm:max-w-[340px] h-auto object-contain mx-auto drop-shadow-[0_4px_24px_rgba(245,183,0,0.45)] pointer-events-none mb-1"
+        />
+        <div className="subtitle-lines w-full mt-2 select-none">
+          <p className="text-garba-light text-xs sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.3em] font-semibold uppercase whitespace-nowrap px-3 sm:px-4">
             Authorized Access
           </p>
         </div>
       </div>
 
       <div className="w-full max-w-md ornate-card transition-all duration-300">
-        <div className="border-dots opacity-50 mt-4 mx-4"></div>
-        <div className="p-8 pt-4">
+        <div className="border-dots opacity-50 mt-3 mx-4"></div>
+        <div className="p-5 sm:p-8 pt-4">
           
           <div className="flex gap-4 mb-6">
             <button 
+              type="button"
               onClick={() => { setIsRegistering(false); setError(""); setSuccess(""); }}
-              className={`flex-1 pb-2 text-sm font-bold uppercase tracking-wider transition-colors ${!isRegistering ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 border-b-2 border-transparent hover:text-garba-light'}`}
+              className={`flex-1 pb-2 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer touch-manipulation select-none ${!isRegistering ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 border-b-2 border-transparent hover:text-garba-light'}`}
             >
               Login
             </button>
             <button 
+              type="button"
               onClick={() => { setIsRegistering(true); setError(""); setSuccess(""); }}
-              className={`flex-1 pb-2 text-sm font-bold uppercase tracking-wider transition-colors ${isRegistering ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 border-b-2 border-transparent hover:text-garba-light'}`}
+              className={`flex-1 pb-2 text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer touch-manipulation select-none ${isRegistering ? 'text-garba-gold border-b-2 border-garba-gold' : 'text-garba-light/50 border-b-2 border-transparent hover:text-garba-light'}`}
             >
               Request Access
             </button>
@@ -200,12 +204,12 @@ export default function Login() {
             <button 
               type="submit"
               disabled={loading}
-              className="mt-4 w-full bg-gradient-to-r from-garba-gold to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-garba-maroon font-black text-xl py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+              className="mt-4 w-full bg-gradient-to-r from-garba-gold to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-garba-maroon font-black text-xl py-4 rounded-xl shadow-lg transition-all cursor-pointer touch-manipulation select-none active:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {loading ? (
-                <div className="w-6 h-6 border-4 border-garba-maroon border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-6 h-6 border-4 border-garba-maroon border-t-transparent rounded-full animate-spin pointer-events-none"></div>
               ) : (
-                isRegistering ? "SUBMIT REQUEST" : "LOGIN"
+                <span className="pointer-events-none">{isRegistering ? "SUBMIT REQUEST" : "LOGIN"}</span>
               )}
             </button>
           </form>
