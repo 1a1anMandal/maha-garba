@@ -127,81 +127,197 @@ export default function AdminDashboard() {
     setIsExporting(true);
     setExportMenuOpen(false);
     try {
-      let dataToExport = entries;
+      let rawData = entries;
       
       if (exportType === 'duo') {
-        dataToExport = entries.filter(e => e.entry_type === 'duo');
+        rawData = entries.filter(e => e.entry_type === 'duo');
       } else if (exportType === 'stag') {
-        dataToExport = entries.filter(e => e.entry_type === 'stag');
+        rawData = entries.filter(e => e.entry_type === 'stag');
       } else if (exportType === 'filtered') {
-        dataToExport = filteredData;
+        rawData = filteredData;
       }
       
-      // Sort by Pass Number
-      dataToExport = [...dataToExport].sort((a, b) => (a.pass_serial ? a.pass_serial.split('_')[0] : "").localeCompare(b.pass_serial ? b.pass_serial.split('_')[0] : "", undefined, { numeric: true }));
-      
+      if (!rawData || rawData.length === 0) {
+        alert('No records available to export.');
+        setIsExporting(false);
+        return;
+      }
+
+      // Check if this export is single category or combined
+      const isDuoOnly = exportType === 'duo' || (exportType === 'filtered' && filterType === 'duo');
+      const isStagOnly = exportType === 'stag' || (exportType === 'filtered' && filterType === 'stag');
+
+      // 1. Gather all unique attendance dates present in this export dataset, sorted chronologically ascending
+      const dateList = Array.from(new Set(rawData.map(e => e.entry_date).filter(Boolean)))
+        .sort((a, b) => (a as string).localeCompare(b as string));
+
+      // Helper to format date header as DD-MMM (e.g. "29-Sep", "01-Oct", "10-Oct")
+      const formatDateHeader = (dStr: string) => {
+        try {
+          const parts = dStr.split('-');
+          if (parts.length === 3) {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const mIdx = parseInt(parts[1], 10) - 1;
+            return `${parts[2].padStart(2, '0')}-${months[mIdx] || parts[1]}`;
+          }
+        } catch {}
+        return dStr;
+      };
+
+      const dateHeaders = dateList.map(d => formatDateHeader(d as string));
+
+      // 2. Group records by unique pass (pass_serial prefix + entry_type)
+      interface GroupedPass {
+        passNumber: string;
+        entryType: 'stag' | 'duo';
+        name_1: string;
+        name_2: string;
+        datesAttended: Set<string>;
+      }
+
+      const passMap = new Map<string, GroupedPass>();
+
+      rawData.forEach(item => {
+        const passNum = item.pass_serial ? item.pass_serial.split('_')[0] : '';
+        const key = `${passNum}_${item.entry_type}`;
+        if (!passMap.has(key)) {
+          passMap.set(key, {
+            passNumber: passNum,
+            entryType: item.entry_type,
+            name_1: item.name_1 || '',
+            name_2: item.name_2 || '',
+            datesAttended: new Set([item.entry_date]),
+          });
+        } else {
+          const existing = passMap.get(key)!;
+          existing.datesAttended.add(item.entry_date);
+          if (!existing.name_1 && item.name_1) existing.name_1 = item.name_1;
+          if (!existing.name_2 && item.name_2) existing.name_2 = item.name_2;
+        }
+      });
+
+      // Sort passes numerically
+      const uniquePasses = Array.from(passMap.values()).sort((a, b) =>
+        a.passNumber.localeCompare(b.passNumber, undefined, { numeric: true })
+      );
+
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet('Attendance');
 
-      // Title Row
-      const typeLabel = exportType === 'all' || exportType === 'filtered' 
-                        ? (filterType === 'all' ? 'ALL' : filterType.toUpperCase()) 
-                        : exportType.toUpperCase();
-      const dateLabel = exportType === 'filtered' && filterDate !== 'all' ? filterDate : 'ALL DATES';
-      
-      const titleRow = sheet.addRow([`GARBA WORKSHOP ATTENDANCE — ${typeLabel} PASS — ${dateLabel}`]);
-      titleRow.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FFFFFFFF' } };
-      titleRow.alignment = { horizontal: 'center', vertical: 'middle' };
-      titleRow.height = 30;
-      sheet.mergeCells('A1:E1');
-      titleRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF800000' } };
+      // 3. Define Header Columns based on export type
+      let headerLabels: string[] = [];
+      if (isDuoOnly) {
+        headerLabels = ['Pass Number (DUO)', 'Name', 'Name 2', ...dateHeaders];
+      } else if (isStagOnly) {
+        headerLabels = ['Pass Number (STAG)', 'Name', ...dateHeaders];
+      } else {
+        headerLabels = ['Pass Number', 'Pass Type', 'Name', 'Name 2', ...dateHeaders];
+      }
 
-      // Header Row
-      const headerRow = sheet.addRow(['Pass Number', 'Name', 'Name 2', 'Entry Date', 'Time']);
+      const headerRow = sheet.addRow(headerLabels);
       headerRow.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
-      headerRow.height = 20;
-      
-      headerRow.eachCell((cell: any) => {
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF800000' } };
+      headerRow.height = 24;
+
+      headerRow.eachCell((cell) => {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF800000' } }; // Garba Maroon
         cell.alignment = { horizontal: 'center', vertical: 'middle' };
         cell.border = {
-          top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }
+          top: { style: 'thin', color: { argb: 'FFD4AF37' } },
+          left: { style: 'thin', color: { argb: 'FFD4AF37' } },
+          bottom: { style: 'thin', color: { argb: 'FFD4AF37' } },
+          right: { style: 'thin', color: { argb: 'FFD4AF37' } }
         };
       });
 
-      // Columns Width
-      sheet.getColumn(1).width = 20;
-      sheet.getColumn(2).width = 30;
-      sheet.getColumn(3).width = 30;
-      sheet.getColumn(4).width = 15;
-      sheet.getColumn(5).width = 15;
+      // Freeze top row
+      sheet.views = [{ state: 'frozen', ySplit: 1 }];
 
-      // Data Rows
-      dataToExport.forEach(row => {
-        const timeStr = new Date(row.created_at).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
-        const dataRow = sheet.addRow([
-            row.pass_serial.split('_')[0],
-          row.name_1,
-          row.name_2 || '',
-          row.entry_date,
-          timeStr
-        ]);
-        
-        dataRow.eachCell((cell: any) => {
-          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      // 4. Populate rows: ONE row per unique pass with columns for attendance
+      uniquePasses.forEach(pass => {
+        const rowValues: string[] = [];
+
+        if (isDuoOnly) {
+          rowValues.push(pass.passNumber);
+          rowValues.push(pass.name_1);
+          rowValues.push(pass.name_2);
+        } else if (isStagOnly) {
+          rowValues.push(pass.passNumber);
+          rowValues.push(pass.name_1);
+        } else {
+          rowValues.push(pass.passNumber);
+          rowValues.push(pass.entryType.toUpperCase());
+          rowValues.push(pass.name_1);
+          rowValues.push(pass.name_2);
+        }
+
+        // Attendance columns: "Present" if attended, else empty
+        dateList.forEach(d => {
+          if (pass.datesAttended.has(d as string)) {
+            rowValues.push('Present');
+          } else {
+            rowValues.push('');
+          }
+        });
+
+        const dataRow = sheet.addRow(rowValues);
+        dataRow.height = 20;
+
+        dataRow.eachCell((cell, colNumber) => {
+          const isNameCol = isStagOnly 
+            ? colNumber === 2 
+            : isDuoOnly 
+              ? (colNumber === 2 || colNumber === 3)
+              : (colNumber === 3 || colNumber === 4);
+
+          cell.alignment = { 
+            horizontal: isNameCol ? 'left' : 'center', 
+            vertical: 'middle' 
+          };
+
+          if (cell.value === 'Present') {
+            cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF15803D' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF0FDF4' } };
+          } else {
+            cell.font = { name: 'Arial', size: 10 };
+          }
+
           cell.border = {
-            top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' }
+            top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+            right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
           };
         });
+      });
+
+      // 5. Adjust column widths
+      headerLabels.forEach((_, idx) => {
+        const colNum = idx + 1;
+        const col = sheet.getColumn(colNum);
+        const isNameCol = isStagOnly 
+          ? colNum === 2 
+          : isDuoOnly 
+            ? (colNum === 2 || colNum === 3)
+            : (colNum === 3 || colNum === 4);
+
+        if (colNum === 1) {
+          col.width = 20; // Pass Number
+        } else if (!isDuoOnly && !isStagOnly && colNum === 2) {
+          col.width = 14; // Pass Type
+        } else if (isNameCol) {
+          col.width = 26; // Name / Name 2
+        } else {
+          col.width = 13; // Date columns
+        }
       });
 
       const buffer = await (workbook.xlsx as any).writeBuffer();
       const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       
-      let fileName = 'Maha_Garba_Entries';
-      if (exportType === 'duo') fileName = 'Maha_Garba_DUO_Entries';
-      else if (exportType === 'stag') fileName = 'Maha_Garba_STAG_Entries';
-      else if (exportType === 'filtered') fileName = 'Maha_Garba_Filtered_Entries';
+      let fileName = 'Maha_Garba_All_Attendance';
+      if (isDuoOnly) fileName = 'Maha_Garba_DUO_Attendance';
+      else if (isStagOnly) fileName = 'Maha_Garba_STAG_Attendance';
+      else if (exportType === 'filtered') fileName = 'Maha_Garba_Filtered_Attendance';
       
       saveAs(blob, `${fileName}.xlsx`);
       
